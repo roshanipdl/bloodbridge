@@ -3,91 +3,77 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Models\BloodRequest;
 class BloodRequestController extends Controller
 {
+    /**
+     * Display a listing of blood requests for potential donors.
+     */
     public function index()
     {
-        // Get all pending blood requests
         $bloodRequests = BloodRequest::where('status', 'pending')
-            ->latest()
-            ->paginate(10);
-            
-        // Get all requests where the current user is the recipient
-        $myRequests = BloodRequest::where('recipient_id', Auth::id())
-            ->latest()
+            ->orderBy('created_at', 'desc')
             ->get();
-            
-        return view('blood-requests.index', compact('bloodRequests', 'myRequests'));
+
+        return view('blood.donate', compact('bloodRequests'));
     }
 
+
+    /**
+     * Show the form for creating a new blood request.
+     */
     public function create()
     {
-        return view('blood-requests.create');
+        return view('blood.request');
     }
 
+    /**
+     * Store a newly created blood request in storage.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'blood_type' => 'required|string',
-            'location' => 'required|string',
-            'description' => 'nullable|string',
-            'contact_number' => 'required|string',
-            'hospital_name' => 'nullable|string',
-        ]);
-
-        // Create a new blood request
-        BloodRequest::create([
-            'status' => 'pending',
-            'request_date' => now(),
-            'fulfill_date' => null,
-            'donor_id' => null,
-            'recipient_id' => Auth::id(),
-            // Store additional data in a separate table or as JSON
+            'recipient_name' => 'required|string|max:255',
+            'blood_group' => 'required|string|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
+            'units_required' => 'required|integer|min:1',
+            'hospital_name' => 'required|string|max:255',
+            'hospital_address' => 'required|string|max:255',
+            'contact_number' => 'required|string|max:20',
+            'request_date' => 'required|date',
+            'urgency_level' => 'required|string|in:normal,urgent,critical',
+            'additional_info' => 'nullable|string',
         ]);
         
-        return redirect()->route('blood-requests.index')
-            ->with('success', 'Blood request created successfully.');
+        $bloodRequest = new BloodRequest($validated);
+        $bloodRequest->recipient_id = auth()->id();
+        $bloodRequest->status = 'pending';
+        $bloodRequest->save();
+        
+        return redirect()->route('dashboard')
+            ->with('success', 'Blood request submitted successfully.');
     }
 
-    public function show(BloodRequest $bloodRequest)
+    /**
+     * Respond to a blood request.
+     */
+    public function respond(BloodRequest $bloodRequest)
     {
-        // Get additional request details if stored separately
-        return view('blood-requests.show', compact('bloodRequest'));
-    }
-
-    public function edit(BloodRequest $bloodRequest)
-    {
-        $this->authorize('update', $bloodRequest);
+        // Check if request is still pending
+        if ($bloodRequest->status !== 'pending') {
+            return redirect()->route('donate')
+                ->with('error', 'This blood request has already been fulfilled or cancelled.');
+        }
         
-        return view('blood-requests.edit', compact('bloodRequest'));
-    }
-
-    public function update(Request $request, BloodRequest $bloodRequest)
-    {
-        $this->authorize('update', $bloodRequest);
+        // Update the blood request
+        $bloodRequest->donor_id = auth()->id();
+        $bloodRequest->status = 'fulfilled';
+        $bloodRequest->fulfill_date = now()->toDateString();
+        $bloodRequest->save();
         
-        $validated = $request->validate([
-            'status' => 'required|in:pending,fulfilled,cancelled',
-        ]);
+        // Here you would implement notification logic
+        // For example, sending an email to the recipient
         
-        $bloodRequest->update([
-            'status' => $validated['status'],
-            'fulfill_date' => $validated['status'] === 'fulfilled' ? now() : null,
-        ]);
-        
-        return redirect()->route('blood-requests.index')
-            ->with('success', 'Blood request updated successfully.');
-    }
-
-    public function destroy(BloodRequest $bloodRequest)
-    {
-        $this->authorize('delete', $bloodRequest);
-        
-        $bloodRequest->delete();
-        
-        return redirect()->route('blood-requests.index')
-            ->with('success', 'Blood request deleted successfully.');
+        return redirect()->route('donate')
+            ->with('success', 'Thank you for your willingness to donate! The recipient has been notified of your response.');
     }
 }
-

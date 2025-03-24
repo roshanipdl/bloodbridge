@@ -13,12 +13,19 @@ return new class extends Migration
     {
         Schema::create('blood_requests', function (Blueprint $table) {
             $table->id();
-            $table->string('status');
-            $table->date('fulfill_date');
+            $table->string('recipient_name');
+            $table->string('blood_group');
+            $table->integer('units_required');
+            $table->string('hospital_name');
+            $table->string('hospital_address');
+            $table->string('contact_number');
+            $table->enum('urgency_level', ['normal', 'urgent', 'critical'])->default('normal');
+            $table->text('additional_info')->nullable();
+            $table->enum('status', ['pending', 'fulfilled', 'cancelled'])->default('pending');
             $table->date('request_date');
-            $table->foreignId('donor_id')->onDelete('cascade')->nullabe();
-            $table->foreignId('recipient_id')->onDelete('cascade');
-
+            $table->date('fulfill_date')->nullable();
+            $table->foreignId('donor_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('recipient_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\BloodDonationController;
+use App\Http\Controllers\BloodRequestController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,9 +20,22 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
+    
+    // Blood donation routes
+    Route::get('/donate', [BloodRequestController::class, 'index'])->name('donate');
+    
+    // Blood request routes
+    Route::get('/request', [BloodRequestController::class, 'create'])->name('request');
+    Route::post('/request', [BloodRequestController::class, 'store'])->name('request.store');
+
+    // Add this inside the auth middleware group
+    Route::post('/donate/{bloodRequest}', [BloodRequestController::class, 'respond'])->name('donate.respond');
+
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

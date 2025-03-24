@@ -10,12 +10,21 @@ class BloodRequest extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
+   protected $fillable = [
+        'recipient_name',
+        'blood_group',
+        'units_required',
+        'hospital_name',
+        'hospital_address',
+        'contact_number',
+        'urgency_level',
+        'additional_info',
         'status',
-        'fulfill_date',
         'request_date',
+        'fulfill_date',
         'donor_id',
         'recipient_id',
+    
     ];
 
     protected $casts = [
