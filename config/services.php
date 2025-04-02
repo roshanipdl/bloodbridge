@@ -31,4 +31,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'google' => [
+        'maps_api_key' => env('GOOGLE_MAPS_API_KEY'),
+        'maps_default_lat' => env('GOOGLE_MAPS_DEFAULT_LAT', 28.3949), // Default to Nepal's center
+        'maps_default_lng' => env('GOOGLE_MAPS_DEFAULT_LNG', 84.1240),
+        'maps_default_zoom' => env('GOOGLE_MAPS_DEFAULT_ZOOM', 7),
+    ],
+
 ];

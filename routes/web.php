@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BloodDonationController;
 use App\Http\Controllers\BloodRequestController;
+use App\Http\Controllers\RecipientController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -41,6 +42,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Recipient management routes
+    Route::get('/recipients/create', [RecipientController::class, 'create'])->name('recipients.create');
+    Route::post('/recipients', [RecipientController::class, 'store'])->name('recipients.store');
+    Route::get('/recipients/{recipient}/edit', [RecipientController::class, 'edit'])->name('recipients.edit');
+    Route::put('/recipients/{recipient}', [RecipientController::class, 'update'])->name('recipients.update');
 });
 
 require __DIR__.'/auth.php';

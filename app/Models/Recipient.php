@@ -5,6 +5,8 @@ namespace App\Models;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\BloodRequest;
 
 class Recipient extends Model
 {
@@ -21,7 +23,23 @@ class Recipient extends Model
     // protected $primaryKey = 'id';
     // public $timestamps = false;
     protected $guarded = ['id'];
-    // protected $fillable = [];
+    protected $fillable = [
+        'name',
+        'blood_type_needed',
+        'contact',
+        'address',
+        'user_id',
+        'latitude',
+        'longitude',
+        'medical_notes',
+        'special_requirements',
+        'urgency_level'
+    ];
+    protected $casts = [
+        'latitude' => 'float',
+        'longitude' => 'float',
+        'special_requirements' => 'array'
+    ];
     // protected $hidden = [];
     // protected $dates = [];
 
@@ -36,6 +54,16 @@ class Recipient extends Model
     | RELATIONS
     |--------------------------------------------------------------------------
     */
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function bloodRequests()
+    {
+        return $this->hasMany(BloodRequest::class);
+    }
 
     /*
     |--------------------------------------------------------------------------
