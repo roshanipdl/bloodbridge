@@ -59,7 +59,31 @@
                         </select>
                         <x-input-error :messages="$errors->get('urgency_level')" class="mt-2" />
                     </div>
+                    <div>
+                        <x-input-label for="required_by_date" :value="__('Required By Date')" />
+                        <x-text-input id="required_by_date" class="block mt-1 w-full" type="date" name="required_by_date" :value="old('required_by_date')" required />
+                        <x-input-error :messages="$errors->get('required_by_date')" class="mt-2" />
+                    </div>
 
+                    <!-- Location -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <x-input-label for="latitude" :value="__('Latitude')" />
+                            <x-text-input id="latitude" class="block mt-1 w-full" type="number" step="any" name="latitude" :value="old('latitude')" required />
+                            <x-input-error :messages="$errors->get('latitude')" class="mt-2" />
+                        </div>
+                        <div>
+                            <x-input-label for="longitude" :value="__('Longitude')" />
+                            <x-text-input id="longitude" class="block mt-1 w-full" type="number" step="any" name="longitude" :value="old('longitude')" required />
+                            <x-input-error :messages="$errors->get('longitude')" class="mt-2" />
+                        </div>
+                    </div>
+
+                    <!-- Location Map -->
+                    <div>
+                        <div id="map" class="w-full h-64 rounded-lg border border-gray-300 dark:border-gray-700"></div>
+                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Click on the map to set your location</p>
+                    </div>
                     <!-- Additional Notes -->
                     <div>
                         <x-input-label for="notes" :value="__('Additional Notes')" />
@@ -77,13 +101,43 @@
         </div>
     </div>
 
-    @push('scripts')
     <script>
-        document.getElementById('recipient_id').addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            const bloodType = selectedOption.getAttribute('data-blood-type');
-            document.getElementById('blood_type_needed').value = bloodType || '';
-        });
-    </script>
-    @endpush
+        // Initialize and add the map
+let map;
+
+async function initMap() {
+  // The location of Uluru
+  const position = { lat: -25.344, lng: 131.031 };
+  // Request needed libraries.
+  //@ts-ignore
+  const { Map } = await google.maps.importLibrary("maps");
+  const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+  // The map, centered at Uluru
+  map = new Map(document.getElementById("map"), {
+    zoom: 4,
+    center: position,
+    mapId: "DEMO_MAP_ID",
+  });
+
+  // The marker, positioned at Uluru
+  const marker = new AdvancedMarkerElement({
+    map: map,
+    position: position,
+    title: "Uluru",
+  });
+}
+
+initMap();
+</script>
+
+    <!-- Load Google Maps JavaScript API -->
+    <script>
+  (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
+    key: config('services.google.maps_api_key'),
+    v: "weekly",
+    // Use the 'v' parameter to indicate the version to use (weekly, beta, alpha, etc.).
+    // Add other bootstrap parameters as needed, using camel case.
+  });
+</script>
 </x-app-layout>
