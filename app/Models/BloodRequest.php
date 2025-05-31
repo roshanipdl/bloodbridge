@@ -5,6 +5,7 @@ namespace App\Models;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Services\GooglePlacesService;
 
 class BloodRequest extends Model
 {
@@ -12,18 +13,30 @@ class BloodRequest extends Model
     use HasFactory;
 
     protected $fillable = [
-        'recipient_id',
-        'blood_type_needed',
+        'recipient_name',
+        'blood_group',
         'units_required',
+        'hospital_name',
+        'hospital_address',
+        'place_name',
+        'city',
+        'contact_number',
         'urgency_level',
-        'notes',
+        'additional_info',
         'status',
+        'request_date',
         'fulfill_date',
-        'donor_id'
+        'donor_id',
+        'recipient_id',
+        'latitude',
+        'longitude'
     ];
 
     protected $casts = [
-        'fulfill_date' => 'datetime',
+        'request_date' => 'date',
+        'fulfill_date' => 'date',
+        'latitude' => 'decimal:8',
+        'longitude' => 'decimal:8'
     ];
 
     public function donor()
@@ -55,5 +68,23 @@ class BloodRequest extends Model
             ->orderByPivot('score', 'desc')
             ->limit($limit)
             ->get();
+    }
+
+    public function updateLocationFromPlaceId($placeId)
+    {
+        $placesService = app(GooglePlacesService::class);
+        $placeDetails = $placesService->getPlaceDetails($placeId);
+
+        if ($placeDetails) {
+            $this->update([
+                'place_name' => $placeDetails['place_name'],
+                'city' => $placeDetails['city'],
+                'latitude' => $placeDetails['latitude'],
+                'longitude' => $placeDetails['longitude'],
+                'hospital_address' => $placeDetails['formatted_address']
+            ]);
+        }
+
+        return $this;
     }
 }

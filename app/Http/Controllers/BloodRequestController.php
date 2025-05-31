@@ -7,19 +7,48 @@ use App\Models\BloodRequest;
 use App\Models\Recipient;
 use App\Models\Donor;
 use Illuminate\Support\Facades\DB;
+use App\Services\DonorScoringService;
+use App\Services\GooglePlacesService;
+use Illuminate\Support\Facades\Auth;
 
 class BloodRequestController extends Controller
 {
+    protected $placesService;
+
+    public function __construct(GooglePlacesService $placesService)
+    {
+        $this->placesService = $placesService;
+    }
+
     /**
      * Display a listing of blood requests for potential donors.
      */
     public function index()
     {
-        $bloodRequests = BloodRequest::where('status', 'pending')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $user = Auth::user();
+        $donor = \App\Models\Donor::where('user_id', $user->id)->first();
 
-        return view('blood.donate', compact('bloodRequests'));
+        if (!$donor) {
+            // Redirect to donor creation form if no donor entry exists
+            return redirect()->route('donor.create');
+        }
+
+        $bloodRequests = BloodRequest::where('status', 'pending')->get();
+        $scoringService = app(DonorScoringService::class);
+
+        // For each request, score the current donor
+        $scoredRequests = $bloodRequests->map(function ($request) use ($donor, $scoringService) {
+            // Adapt the scoring service: expects a collection of donors, so wrap $donor in a collection
+            $scored = $scoringService->scoreAndRankDonors($request, collect([$donor]))->first();
+            $score = $scored ? $scored['score'] : 0;
+            $request->donor_score = $score;
+            return $request;
+        });
+
+        // Sort by score descending, take top 10
+        $topRequests = $scoredRequests->sortByDesc('donor_score')->take(10)->values();
+
+        return view('blood.donate', ['bloodRequests' => $topRequests]);
     }
 
     /**
@@ -40,12 +69,28 @@ class BloodRequestController extends Controller
             'recipient_id' => 'required|exists:recipients,id',
             'blood_type_needed' => 'required|string|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
             'units_required' => 'required|integer|min:1',
+            'hospital_name' => 'required|string|max:255',
+            'hospital_address' => 'required|string|max:255',
+            'place_id' => 'required|string',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
             'urgency_level' => 'required|string|in:normal,urgent,emergency',
             'notes' => 'nullable|string',
         ]);
 
         // Get recipient details
         $recipient = Recipient::findOrFail($validated['recipient_id']);
+
+        // Get place details from Google Places API
+        $placeDetails = $this->placesService->getPlaceDetails($validated['place_id']);
+        
+        if ($placeDetails) {
+            $validated['place_name'] = $placeDetails['place_name'];
+            $validated['city'] = $placeDetails['city'];
+            $validated['hospital_address'] = $placeDetails['formatted_address'];
+            $validated['latitude'] = $placeDetails['latitude'];
+            $validated['longitude'] = $placeDetails['longitude'];
+        }
 
         // Start a database transaction
         DB::beginTransaction();
@@ -56,6 +101,12 @@ class BloodRequestController extends Controller
             $bloodRequest->recipient_id = $validated['recipient_id'];
             $bloodRequest->blood_type_needed = $validated['blood_type_needed'];
             $bloodRequest->units_required = $validated['units_required'];
+            $bloodRequest->hospital_name = $validated['hospital_name'];
+            $bloodRequest->hospital_address = $validated['hospital_address'];
+            $bloodRequest->place_name = $validated['place_name'];
+            $bloodRequest->city = $validated['city'];
+            $bloodRequest->latitude = $validated['latitude'];
+            $bloodRequest->longitude = $validated['longitude'];
             $bloodRequest->urgency_level = $validated['urgency_level'];
             $bloodRequest->notes = $validated['notes'];
             $bloodRequest->status = 'pending';

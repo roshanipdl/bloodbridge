@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BloodDonationController;
 use App\Http\Controllers\BloodRequestController;
 use App\Http\Controllers\RecipientController;
+use App\Http\Controllers\DonorController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -36,6 +37,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Add this inside the auth middleware group
     Route::post('/donate/{bloodRequest}', [BloodRequestController::class, 'respond'])->name('donate.respond');
 
+    // Donor creation routes
+    Route::get('/donor/create', [DonorController::class, 'create'])->name('donor.create');
+    Route::post('/donor', [DonorController::class, 'store'])->name('donor.store');
 });
 
 Route::middleware('auth')->group(function () {

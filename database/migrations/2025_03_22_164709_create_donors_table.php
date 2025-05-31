@@ -14,11 +14,15 @@ return new class extends Migration
         Schema::create('donors', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('blood_group');
+            $table->string('blood_type');
             $table->string('contact');
             $table->string('address');
-            $table->date('last_donation_date');
-            $table->foreignID('user_id')->onDelete('cascade');
+            $table->decimal('latitude', 10, 8);
+            $table->decimal('longitude', 11, 8);
+            $table->boolean('is_available')->default(true);
+            $table->enum('health_status', ['good', 'pending_review', 'not_eligible'])->default('good');
+            $table->date('last_donation_date')->nullable();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

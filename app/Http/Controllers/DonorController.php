@@ -1,0 +1,170 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Donor;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Services\GooglePlacesService;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
+
+class DonorController extends Controller
+{
+    protected $placesService;
+
+    public function __construct(GooglePlacesService $placesService)
+    {
+        $this->placesService = $placesService;
+    }
+
+    public function create()
+    {
+        return view('donor.create');
+    }
+
+    public function store(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'blood_type' => ['required', 'string', Rule::in(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])],
+                'contact' => ['required', 'string', 'max:20', 'regex:/^[0-9+\-\s()]{10,20}$/'],
+                'address' => ['required', 'string', 'max:255'],
+                'place_id' => ['nullable', 'string'],
+                'latitude' => ['required', 'numeric', 'between:-90,90'],
+                'longitude' => ['required', 'numeric', 'between:-180,180'],
+                'is_available' => ['boolean'],
+                'health_status' => ['required', 'string', Rule::in(['good', 'pending_review', 'not_eligible'])],
+            ], [
+                'name.required' => 'Please enter your full name.',
+                'name.max' => 'Your name cannot exceed 255 characters.',
+                'blood_type.required' => 'Please select your blood type.',
+                'blood_type.in' => 'Please select a valid blood type.',
+                'contact.required' => 'Please enter your contact number.',
+                'contact.regex' => 'Please enter a valid contact number (10-20 digits, may include +, -, spaces, and parentheses).',
+                'contact.max' => 'Contact number cannot exceed 20 characters.',
+                'address.required' => 'Please enter your address.',
+                'address.max' => 'Address cannot exceed 255 characters.',
+                'place_id.string' => 'Invalid location data. Please try selecting the location again.',
+                'latitude.required' => 'Please select a location on the map.',
+                'latitude.between' => 'Invalid latitude value. Please select a location on the map.',
+                'longitude.required' => 'Please select a location on the map.',
+                'longitude.between' => 'Invalid longitude value. Please select a location on the map.',
+                'health_status.required' => 'Please select your health status.',
+                'health_status.in' => 'Please select a valid health status.',
+            ]);
+
+            // Convert checkbox value to boolean
+            $validated['is_available'] = $request->has('is_available');
+
+            // Get place details from Google Places API if place_id is provided
+            if (!empty($validated['place_id'])) {
+                $placeDetails = $this->placesService->getPlaceDetails($validated['place_id']);
+                
+                if ($placeDetails) {
+                    $validated['place_name'] = $placeDetails['place_name'];
+                    $validated['city'] = $placeDetails['city'];
+                    $validated['address'] = $placeDetails['formatted_address'];
+                    $validated['latitude'] = $placeDetails['latitude'];
+                    $validated['longitude'] = $placeDetails['longitude'];
+                }
+            }
+
+            $donor = new Donor($validated);
+            $donor->user_id = Auth::id();
+            $donor->save();
+
+            return redirect()->route('donate')
+                ->with('success', 'Donor profile created successfully.');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()
+                ->withInput()
+                ->withErrors($e->errors());
+        } catch (\Exception $e) {
+            Log::error('Error creating donor profile: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'request_data' => $request->except(['password']),
+                'exception' => $e
+            ]);
+
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'An unexpected error occurred. Please try again later.']);
+        }
+    }
+
+    public function update(Request $request, Donor $donor)
+    {
+        try {
+            $this->authorize('update', $donor);
+
+            $validated = $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'blood_type' => ['required', 'string', Rule::in(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])],
+                'contact' => ['required', 'string', 'max:20', 'regex:/^[0-9+\-\s()]{10,20}$/'],
+                'address' => ['required', 'string', 'max:255'],
+                'place_id' => ['nullable', 'string'],
+                'latitude' => ['required', 'numeric', 'between:-90,90'],
+                'longitude' => ['required', 'numeric', 'between:-180,180'],
+                'is_available' => ['boolean'],
+                'health_status' => ['required', 'string', Rule::in(['good', 'pending_review', 'not_eligible'])],
+            ], [
+                'name.required' => 'Please enter your full name.',
+                'name.max' => 'Your name cannot exceed 255 characters.',
+                'blood_type.required' => 'Please select your blood type.',
+                'blood_type.in' => 'Please select a valid blood type.',
+                'contact.required' => 'Please enter your contact number.',
+                'contact.regex' => 'Please enter a valid contact number (10-20 digits, may include +, -, spaces, and parentheses).',
+                'contact.max' => 'Contact number cannot exceed 20 characters.',
+                'address.required' => 'Please enter your address.',
+                'address.max' => 'Address cannot exceed 255 characters.',
+                'place_id.string' => 'Invalid location data. Please try selecting the location again.',
+                'latitude.required' => 'Please select a location on the map.',
+                'latitude.between' => 'Invalid latitude value. Please select a location on the map.',
+                'longitude.required' => 'Please select a location on the map.',
+                'longitude.between' => 'Invalid longitude value. Please select a location on the map.',
+                'health_status.required' => 'Please select your health status.',
+                'health_status.in' => 'Please select a valid health status.',
+            ]);
+
+            // Convert checkbox value to boolean
+            $validated['is_available'] = $request->has('is_available');
+
+            // Get place details from Google Places API if place_id is provided
+            if (!empty($validated['place_id'])) {
+                $placeDetails = $this->placesService->getPlaceDetails($validated['place_id']);
+                
+                if ($placeDetails) {
+                    $validated['place_name'] = $placeDetails['place_name'];
+                    $validated['city'] = $placeDetails['city'];
+                    $validated['address'] = $placeDetails['formatted_address'];
+                    $validated['latitude'] = $placeDetails['latitude'];
+                    $validated['longitude'] = $placeDetails['longitude'];
+                }
+            }
+
+            $donor->update($validated);
+
+            return redirect()->route('dashboard')
+                ->with('success', 'Donor profile updated successfully.');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()
+                ->withInput()
+                ->withErrors($e->errors());
+        } catch (\Exception $e) {
+            Log::error('Error updating donor profile: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'donor_id' => $donor->id,
+                'request_data' => $request->except(['password']),
+                'exception' => $e
+            ]);
+
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'An unexpected error occurred. Please try again later.']);
+        }
+    }
+} 
