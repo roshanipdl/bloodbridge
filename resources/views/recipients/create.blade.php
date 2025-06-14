@@ -1,94 +1,144 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Add New Recipient') }}
-        </h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('Add New Recipient') }}
+            </h2>
+            <a href="{{ route('request') }}"
+                class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                {{ __('Back to Request') }}
+            </a>
+        </div>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <form method="POST" action="{{ route('recipients.store') }}" class="space-y-6">
-                    @csrf
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6">
+                    <form method="POST" action="{{ route('recipients.store') }}" class="space-y-8">
+                        @csrf
 
-                    <!-- Name -->
-                    <div>
-                        <x-input-label for="name" :value="__('Full Name')" />
-                        <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus />
-                        <x-input-error :messages="$errors->get('name')" class="mt-2" />
-                    </div>
+                        <!-- Personal Information Section -->
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Personal Information</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Name -->
+                                <div>
+                                    <x-input-label for="name" :value="__('Full Name')" class="text-gray-700" />
+                                    <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" 
+                                        :value="old('name')" required autofocus 
+                                        placeholder="Enter recipient's full name" />
+                                    <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                                </div>
 
-                    <!-- Contact -->
-                    <div>
-                        <x-input-label for="contact" :value="__('Contact Number')" />
-                        <x-text-input id="contact" class="block mt-1 w-full" type="text" name="contact" :value="old('contact')" required />
-                        <x-input-error :messages="$errors->get('contact')" class="mt-2" />
-                    </div>
+                                <!-- Contact -->
+                                <div>
+                                    <x-input-label for="contact" :value="__('Contact Number')" class="text-gray-700" />
+                                    <x-text-input id="contact" class="block mt-1 w-full" type="text" name="contact" 
+                                        :value="old('contact')" required 
+                                        placeholder="Enter contact number" />
+                                    <x-input-error :messages="$errors->get('contact')" class="mt-2" />
+                                </div>
 
-                    <!-- Address -->
-                    <div>
-                        <x-input-label for="address" :value="__('Address')" />
-                        <x-text-input id="address" class="block mt-1 w-full" type="text" name="address" :value="old('address')" required />
-                        <x-input-error :messages="$errors->get('address')" class="mt-2" />
-                    </div>
-
-                    <!-- Blood Type Needed -->
-                    <div>
-                        <x-input-label for="blood_type_needed" :value="__('Required Blood Type')" />
-                        <select id="blood_type_needed" name="blood_type_needed" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
-                            <option value="">Select Blood Type</option>
-                            <option value="A+" {{ old('blood_type_needed') == 'A+' ? 'selected' : '' }}>A+</option>
-                            <option value="A-" {{ old('blood_type_needed') == 'A-' ? 'selected' : '' }}>A-</option>
-                            <option value="B+" {{ old('blood_type_needed') == 'B+' ? 'selected' : '' }}>B+</option>
-                            <option value="B-" {{ old('blood_type_needed') == 'B-' ? 'selected' : '' }}>B-</option>
-                            <option value="AB+" {{ old('blood_type_needed') == 'AB+' ? 'selected' : '' }}>AB+</option>
-                            <option value="AB-" {{ old('blood_type_needed') == 'AB-' ? 'selected' : '' }}>AB-</option>
-                            <option value="O+" {{ old('blood_type_needed') == 'O+' ? 'selected' : '' }}>O+</option>
-                            <option value="O-" {{ old('blood_type_needed') == 'O-' ? 'selected' : '' }}>O-</option>
-                        </select>
-                        <x-input-error :messages="$errors->get('blood_type_needed')" class="mt-2" />
-                    </div>
-
-                    <!-- Location -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <x-input-label for="latitude" :value="__('Latitude')" />
-                            <x-text-input id="latitude" class="block mt-1 w-full" type="number" step="any" name="latitude" :value="old('latitude')" required />
-                            <x-input-error :messages="$errors->get('latitude')" class="mt-2" />
+                                <!-- Address -->
+                                <div class="md:col-span-2">
+                                    <x-input-label for="address" :value="__('Address')" class="text-gray-700" />
+                                    <x-text-input id="address" class="block mt-1 w-full" type="text" name="address" 
+                                        :value="old('address')" required 
+                                        placeholder="Enter complete address" />
+                                    <x-input-error :messages="$errors->get('address')" class="mt-2" />
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <x-input-label for="longitude" :value="__('Longitude')" />
-                            <x-text-input id="longitude" class="block mt-1 w-full" type="number" step="any" name="longitude" :value="old('longitude')" required />
-                            <x-input-error :messages="$errors->get('longitude')" class="mt-2" />
+
+                        <!-- Blood Type Section -->
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Blood Type Information</h3>
+                            
+                            <div>
+                                <x-input-label for="blood_type_needed" :value="__('Required Blood Type')" class="text-gray-700" />
+                                <select id="blood_type_needed" name="blood_type_needed" 
+                                    class="block mt-1 w-full border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm" 
+                                    required>
+                                    <option value="">Select Blood Type</option>
+                                    <option value="A+" {{ old('blood_type_needed') == 'A+' ? 'selected' : '' }}>A+</option>
+                                    <option value="A-" {{ old('blood_type_needed') == 'A-' ? 'selected' : '' }}>A-</option>
+                                    <option value="B+" {{ old('blood_type_needed') == 'B+' ? 'selected' : '' }}>B+</option>
+                                    <option value="B-" {{ old('blood_type_needed') == 'B-' ? 'selected' : '' }}>B-</option>
+                                    <option value="AB+" {{ old('blood_type_needed') == 'AB+' ? 'selected' : '' }}>AB+</option>
+                                    <option value="AB-" {{ old('blood_type_needed') == 'AB-' ? 'selected' : '' }}>AB-</option>
+                                    <option value="O+" {{ old('blood_type_needed') == 'O+' ? 'selected' : '' }}>O+</option>
+                                    <option value="O-" {{ old('blood_type_needed') == 'O-' ? 'selected' : '' }}>O-</option>
+                                </select>
+                                <x-input-error :messages="$errors->get('blood_type_needed')" class="mt-2" />
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Location Map -->
-                    <div>
-                        <div id="map" class="w-full h-64 rounded-lg border border-gray-300 dark:border-gray-700"></div>
-                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Click on the map to set your location</p>
-                    </div>
+                        <!-- Location Section -->
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Location</h3>
+                            
+                            <div class="space-y-6">
+                                <!-- Location Map -->
+                                <div>
+                                    <div id="map" class="w-full h-[400px] rounded-lg border border-gray-300 shadow-sm"></div>
+                                    <p class="mt-2 text-sm text-gray-600">Click on the map to set your location or use your current location</p>
+                                </div>
 
-                    <!-- Medical Notes -->
-                    <div>
-                        <x-input-label for="medical_notes" :value="__('Medical Notes')" />
-                        <textarea id="medical_notes" name="medical_notes" rows="3" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">{{ old('medical_notes') }}</textarea>
-                        <x-input-error :messages="$errors->get('medical_notes')" class="mt-2" />
-                    </div>
+                                <!-- Coordinates -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <x-input-label for="latitude" :value="__('Latitude')" class="text-gray-700" />
+                                        <x-text-input id="latitude" class="block mt-1 w-full" type="number" step="any" 
+                                            name="latitude" :value="old('latitude')" required 
+                                            placeholder="Latitude" />
+                                        <x-input-error :messages="$errors->get('latitude')" class="mt-2" />
+                                    </div>
+                                    <div>
+                                        <x-input-label for="longitude" :value="__('Longitude')" class="text-gray-700" />
+                                        <x-text-input id="longitude" class="block mt-1 w-full" type="number" step="any" 
+                                            name="longitude" :value="old('longitude')" required 
+                                            placeholder="Longitude" />
+                                        <x-input-error :messages="$errors->get('longitude')" class="mt-2" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                    <!-- Special Requirements -->
-                    <div>
-                        <x-input-label for="special_requirements" :value="__('Special Requirements')" />
-                        <textarea id="special_requirements" name="special_requirements" rows="3" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">{{ old('special_requirements') }}</textarea>
-                        <x-input-error :messages="$errors->get('special_requirements')" class="mt-2" />
-                    </div>
+                        <!-- Additional Information Section -->
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Additional Information</h3>
+                            
+                            <div class="space-y-6">
+                                <!-- Medical Notes -->
+                                <div>
+                                    <x-input-label for="medical_notes" :value="__('Medical Notes')" class="text-gray-700" />
+                                    <textarea id="medical_notes" name="medical_notes" rows="3" 
+                                        class="block mt-1 w-full border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm"
+                                        placeholder="Enter any relevant medical information...">{{ old('medical_notes') }}</textarea>
+                                    <x-input-error :messages="$errors->get('medical_notes')" class="mt-2" />
+                                </div>
 
-                    <div class="flex items-center justify-end mt-4">
-                        <x-primary-button class="ml-4">
-                            {{ __('Create Recipient') }}
-                        </x-primary-button>
-                    </div>
-                </form>
+                                <!-- Special Requirements -->
+                                <div>
+                                    <x-input-label for="special_requirements" :value="__('Special Requirements')" class="text-gray-700" />
+                                    <textarea id="special_requirements" name="special_requirements" rows="3" 
+                                        class="block mt-1 w-full border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm"
+                                        placeholder="Enter special requirements (one per line)...">{{ old('special_requirements') }}</textarea>
+                                    <p class="mt-1 text-sm text-gray-500">Enter each requirement on a new line</p>
+                                    <x-input-error :messages="$errors->get('special_requirements')" class="mt-2" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-end">
+                            <x-primary-button class="bg-red-600 hover:bg-red-700 focus:bg-red-700 active:bg-red-900">
+                                {{ __('Create Recipient') }}
+                            </x-primary-button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -115,7 +165,14 @@
             
             map = new google.maps.Map(document.getElementById('map'), {
                 center: defaultLocation,
-                zoom: GOOGLE_MAPS_CONFIG.defaultZoom
+                zoom: GOOGLE_MAPS_CONFIG.defaultZoom,
+                styles: [
+                    {
+                        featureType: "poi",
+                        elementType: "labels",
+                        stylers: [{ visibility: "off" }]
+                    }
+                ]
             });
 
             const lat = document.getElementById('latitude').value;

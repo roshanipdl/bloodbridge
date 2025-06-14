@@ -37,6 +37,18 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
+    public function updateDonor(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'blood_type' => ['required', 'string', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
+            'last_donation' => ['nullable', 'date', 'before_or_equal:today'],
+        ]);
+
+        $request->user()->update($validated);
+
+        return Redirect::route('profile.edit')->with('status', 'donor-info-updated');
+    }
+
     /**
      * Delete the user's account.
      */

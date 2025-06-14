@@ -1,112 +1,152 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Create Donor Profile') }}
-        </h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('Create Donor Profile') }}
+            </h2>
+            <a href="{{ route('dashboard') }}"
+                class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                {{ __('Back to Dashboard') }}
+            </a>
+        </div>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                @if ($errors->any())
-                    <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-                        <ul class="list-disc list-inside">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                <form method="POST" action="{{ route('donor.store') }}" class="space-y-6">
-                    @csrf
-
-                    <!-- Name -->
-                    <div>
-                        <x-input-label for="name" :value="__('Full Name')" />
-                        <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus />
-                        <x-input-error :messages="$errors->get('name')" class="mt-2" />
-                    </div>
-
-                    <!-- Blood Type -->
-                    <div>
-                        <x-input-label for="blood_type" :value="__('Blood Type')" />
-                        <select id="blood_type" name="blood_type" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-                            <option value="A+" {{ old('blood_type') == 'A+' ? 'selected' : '' }}>A+</option>
-                            <option value="A-" {{ old('blood_type') == 'A-' ? 'selected' : '' }}>A-</option>
-                            <option value="B+" {{ old('blood_type') == 'B+' ? 'selected' : '' }}>B+</option>
-                            <option value="B-" {{ old('blood_type') == 'B-' ? 'selected' : '' }}>B-</option>
-                            <option value="AB+" {{ old('blood_type') == 'AB+' ? 'selected' : '' }}>AB+</option>
-                            <option value="AB-" {{ old('blood_type') == 'AB-' ? 'selected' : '' }}>AB-</option>
-                            <option value="O+" {{ old('blood_type') == 'O+' ? 'selected' : '' }}>O+</option>
-                            <option value="O-" {{ old('blood_type') == 'O-' ? 'selected' : '' }}>O-</option>
-                        </select>
-                        <x-input-error :messages="$errors->get('blood_type')" class="mt-2" />
-                    </div>
-
-                    <!-- Contact -->
-                    <div>
-                        <x-input-label for="contact" :value="__('Contact Number')" />
-                        <x-text-input id="contact" class="block mt-1 w-full" type="text" name="contact" :value="old('contact')" required />
-                        <x-input-error :messages="$errors->get('contact')" class="mt-2" />
-                    </div>
-
-                    <!-- Address -->
-                    <div>
-                        <x-input-label for="address" :value="__('Address')" />
-                        <x-text-input id="address" class="block mt-1 w-full" type="text" name="address" :value="old('address')" required />
-                        <x-input-error :messages="$errors->get('address')" class="mt-2" />
-                    </div>
-
-                    <!-- Location -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <x-input-label for="latitude" :value="__('Latitude')" />
-                            <x-text-input id="latitude" class="block mt-1 w-full" type="number" step="any" name="latitude" :value="old('latitude')" required />
-                            <x-input-error :messages="$errors->get('latitude')" class="mt-2" />
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6">
+                    @if ($errors->any())
+                        <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+                            <ul class="list-disc list-inside space-y-1">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
                         </div>
-                        <div>
-                            <x-input-label for="longitude" :value="__('Longitude')" />
-                            <x-text-input id="longitude" class="block mt-1 w-full" type="number" step="any" name="longitude" :value="old('longitude')" required />
-                            <x-input-error :messages="$errors->get('longitude')" class="mt-2" />
+                    @endif
+
+                    <form method="POST" action="{{ route('donor.store') }}" class="space-y-8">
+                        @csrf
+
+                        <!-- Personal Information Section -->
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Personal Information</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Name -->
+                                <div>
+                                    <x-input-label for="name" :value="__('Full Name')" class="text-gray-700" />
+                                    <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" 
+                                        :value="old('name')" required autofocus 
+                                        placeholder="Enter your full name" />
+                                    <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                                </div>
+
+                                <!-- Contact -->
+                                <div>
+                                    <x-input-label for="contact" :value="__('Contact Number')" class="text-gray-700" />
+                                    <x-text-input id="contact" class="block mt-1 w-full" type="text" name="contact" 
+                                        :value="old('contact')" required 
+                                        placeholder="Enter your contact number" />
+                                    <x-input-error :messages="$errors->get('contact')" class="mt-2" />
+                                </div>
+
+                                <!-- Blood Type -->
+                                <div>
+                                    <x-input-label for="blood_type" :value="__('Blood Type')" class="text-gray-700" />
+                                    <select id="blood_type" name="blood_type" 
+                                        class="block mt-1 w-full border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm">
+                                        <option value="">Select your blood type</option>
+                                        <option value="A+" {{ old('blood_type') == 'A+' ? 'selected' : '' }}>A+</option>
+                                        <option value="A-" {{ old('blood_type') == 'A-' ? 'selected' : '' }}>A-</option>
+                                        <option value="B+" {{ old('blood_type') == 'B+' ? 'selected' : '' }}>B+</option>
+                                        <option value="B-" {{ old('blood_type') == 'B-' ? 'selected' : '' }}>B-</option>
+                                        <option value="AB+" {{ old('blood_type') == 'AB+' ? 'selected' : '' }}>AB+</option>
+                                        <option value="AB-" {{ old('blood_type') == 'AB-' ? 'selected' : '' }}>AB-</option>
+                                        <option value="O+" {{ old('blood_type') == 'O+' ? 'selected' : '' }}>O+</option>
+                                        <option value="O-" {{ old('blood_type') == 'O-' ? 'selected' : '' }}>O-</option>
+                                    </select>
+                                    <x-input-error :messages="$errors->get('blood_type')" class="mt-2" />
+                                </div>
+
+                                <!-- Health Status -->
+                                <div>
+                                    <x-input-label for="health_status" :value="__('Health Status')" class="text-gray-700" />
+                                    <select id="health_status" name="health_status" 
+                                        class="block mt-1 w-full border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm">
+                                        <option value="good" {{ old('health_status') == 'good' ? 'selected' : '' }}>Good</option>
+                                        <option value="pending_review" {{ old('health_status') == 'pending_review' ? 'selected' : '' }}>Pending Review</option>
+                                        <option value="not_eligible" {{ old('health_status') == 'not_eligible' ? 'selected' : '' }}>Not Eligible</option>
+                                    </select>
+                                    <x-input-error :messages="$errors->get('health_status')" class="mt-2" />
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Hidden place_id field -->
-                    <input type="hidden" id="place_id" name="place_id" value="{{ old('place_id') }}">
+                        <!-- Location Section -->
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Location</h3>
+                            
+                            <div class="space-y-6">
+                                <!-- Location Map -->
+                                <div>
+                                    <div id="map" class="w-full h-[400px] rounded-lg border border-gray-300 shadow-sm"></div>
+                                    <p class="mt-2 text-sm text-gray-600">Click on the map to set your location or use your current location</p>
+                                </div>
 
-                    <!-- Location Map -->
-                    <div>
-                        <div id="map" class="w-full h-64 rounded-lg border border-gray-300 dark:border-gray-700" style="height: 500px;">
+                                <!-- Address -->
+                                <div>
+                                    <x-input-label for="address" :value="__('Address')" class="text-gray-700" />
+                                    <x-text-input id="address" class="block mt-1 w-full" type="text" name="address" 
+                                        :value="old('address')" required 
+                                        placeholder="Your address will be auto-filled when you select a location on the map" />
+                                    <x-input-error :messages="$errors->get('address')" class="mt-2" />
+                                </div>
+
+                                <!-- Coordinates -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <x-input-label for="latitude" :value="__('Latitude')" class="text-gray-700" />
+                                        <x-text-input id="latitude" class="block mt-1 w-full" type="number" step="any" 
+                                            name="latitude" :value="old('latitude')" required 
+                                            placeholder="Latitude" />
+                                        <x-input-error :messages="$errors->get('latitude')" class="mt-2" />
+                                    </div>
+                                    <div>
+                                        <x-input-label for="longitude" :value="__('Longitude')" class="text-gray-700" />
+                                        <x-text-input id="longitude" class="block mt-1 w-full" type="number" step="any" 
+                                            name="longitude" :value="old('longitude')" required 
+                                            placeholder="Longitude" />
+                                        <x-input-error :messages="$errors->get('longitude')" class="mt-2" />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Click on the map to set your location</p>
-                        <x-input-error :messages="$errors->get('place_id')" class="mt-2" />
-                    </div>
 
-                    <!-- Availability -->
-                    <div>
-                        <x-input-label for="is_available" :value="__('Available for Donation')" />
-                        <input type="checkbox" id="is_available" name="is_available" value="1" {{ old('is_available') ? 'checked' : '' }} class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
-                        <x-input-error :messages="$errors->get('is_available')" class="mt-2" />
-                    </div>
+                        <!-- Availability Section -->
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Donation Availability</h3>
+                            
+                            <div class="flex items-center space-x-3">
+                                <input type="checkbox" id="is_available" name="is_available" value="1" 
+                                    {{ old('is_available') ? 'checked' : '' }} 
+                                    class="rounded border-gray-300 text-red-600 shadow-sm focus:ring-red-500">
+                                <x-input-label for="is_available" :value="__('I am available for blood donation')" class="text-gray-700" />
+                            </div>
+                            <p class="mt-2 text-sm text-gray-500">Check this box if you are currently available to donate blood</p>
+                            <x-input-error :messages="$errors->get('is_available')" class="mt-2" />
+                        </div>
 
-                    <!-- Health Status -->
-                    <div>
-                        <x-input-label for="health_status" :value="__('Health Status')" />
-                        <select id="health_status" name="health_status" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-                            <option value="good" {{ old('health_status') == 'good' ? 'selected' : '' }}>Good</option>
-                            <option value="pending_review" {{ old('health_status') == 'pending_review' ? 'selected' : '' }}>Pending Review</option>
-                            <option value="not_eligible" {{ old('health_status') == 'not_eligible' ? 'selected' : '' }}>Not Eligible</option>
-                        </select>
-                        <x-input-error :messages="$errors->get('health_status')" class="mt-2" />
-                    </div>
+                        <!-- Hidden place_id field -->
+                        <input type="hidden" id="place_id" name="place_id" value="{{ old('place_id') }}">
 
-                    <div class="flex items-center justify-end mt-4">
-                        <x-primary-button>
-                            {{ __('Create Donor Profile') }}
-                        </x-primary-button>
-                    </div>
-                </form>
+                        <div class="flex items-center justify-end">
+                            <x-primary-button class="bg-red-600 hover:bg-red-700 focus:bg-red-700 active:bg-red-900">
+                                {{ __('Create Donor Profile') }}
+                            </x-primary-button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -118,24 +158,30 @@
 
         async function initMap() {
             try {
-                // The location of Kathmandu
                 const position = {
                     lat: 27.7103,
                     lng: 85.3222
                 };
-                // Request needed libraries.
-                //@ts-ignore
+
+                // Request needed libraries
                 const { Map } = await google.maps.importLibrary("maps");
                 const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
-                // The map, centered at Kathmandu
+                // Create the map
                 map = new Map(document.getElementById("map"), {
                     zoom: 15,
                     center: position,
                     mapId: "DEMO_MAP_ID",
+                    styles: [
+                        {
+                            featureType: "poi",
+                            elementType: "labels",
+                            stylers: [{ visibility: "off" }]
+                        }
+                    ]
                 });
 
-                // The marker, positioned at Kathmandu
+                // Create the marker
                 marker = new AdvancedMarkerElement({
                     map: map,
                     position: position,
@@ -147,10 +193,7 @@
                     const lat = e.latLng.lat();
                     const lng = e.latLng.lng();
 
-                    // Update marker position
                     marker.position = e.latLng;
-
-                    // Update input fields
                     document.getElementById("latitude").value = lat.toFixed(6);
                     document.getElementById("longitude").value = lng.toFixed(6);
 
@@ -173,6 +216,26 @@
                 document.getElementById("latitude").addEventListener("change", updateMarkerPosition);
                 document.getElementById("longitude").addEventListener("change", updateMarkerPosition);
 
+                // Try to get user's current location
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            const userLocation = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude
+                            };
+                            map.setCenter(userLocation);
+                            map.setZoom(15);
+                            marker.position = userLocation;
+                            document.getElementById("latitude").value = userLocation.lat.toFixed(6);
+                            document.getElementById("longitude").value = userLocation.lng.toFixed(6);
+                        },
+                        function(error) {
+                            console.log('Error getting location:', error);
+                        }
+                    );
+                }
+
             } catch (error) {
                 console.error('Error initializing map:', error);
             }
@@ -183,19 +246,18 @@
             const lng = parseFloat(document.getElementById("longitude").value);
 
             if (!isNaN(lat) && !isNaN(lng)) {
-                const newPosition = {
-                    lat,
-                    lng
-                };
+                const newPosition = { lat, lng };
                 marker.position = newPosition;
                 map.setCenter(newPosition);
             }
         }
 
+        // Initialize the map
         initMap();
     </script>
 
-    <!-- prettier-ignore -->
-    <script>(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
-    ({key: "AIzaSyAMrmDSTM1LKOR0s5VR_aGUXfVSwLL6cPg", v: "weekly", libraries: ["maps", "marker"]});</script>
+    <!-- Load Google Maps API -->
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&callback=initMap">
+    </script>
 </x-app-layout> 
