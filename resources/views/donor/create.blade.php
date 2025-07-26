@@ -151,6 +151,7 @@
         </div>
     </div>
 
+    @push('scripts')
     <script type="module">
         // Initialize and add the map
         let map;

@@ -144,28 +144,23 @@
     </div>
 
     @push('scripts')
-    <script>
-        window.GOOGLE_MAPS_CONFIG = {
-            defaultLat: {{ number_format(config('services.google.maps_default_lat'), 6) }},
-            defaultLng: {{ number_format(config('services.google.maps_default_lng'), 6) }},
-            defaultZoom: {{ config('services.google.maps_default_zoom') }},
-            apiKey: "{{ config('services.google.maps_api_key') }}"
-        };
-    </script>
-
-    <script>
+    <script type="module">
         let map;
         let marker;
 
-        function initMap() {
-            const defaultLocation = { 
-                lat: GOOGLE_MAPS_CONFIG.defaultLat, 
-                lng: GOOGLE_MAPS_CONFIG.defaultLng 
+        async function initMap() {  
+            const position = {
+                lat: 27.7103,
+                lng: 85.3222
             };
-            
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: defaultLocation,
-                zoom: GOOGLE_MAPS_CONFIG.defaultZoom,
+
+            const { Map } = await google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+            map = new Map(document.getElementById("map"), {
+                zoom: 12,
+                center: position,
+                mapId: "DEMO_MAP_ID",
                 styles: [
                     {
                         featureType: "poi",
@@ -175,52 +170,37 @@
                 ]
             });
 
-            const lat = document.getElementById('latitude').value;
-            const lng = document.getElementById('longitude').value;
-            if (lat && lng) {
-                const position = { lat: parseFloat(lat), lng: parseFloat(lng) };
-                setMarker(position);
-            }
-
-            map.addListener('click', function(e) {
-                const position = e.latLng.toJSON();
-                setMarker(position);
-                updateCoordinateInputs(position);
-            });
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    function(position) {
-                        const userLocation = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude
-                        };
-                        map.setCenter(userLocation);
-                        map.setZoom(15);
-                        setMarker(userLocation);
-                        updateCoordinateInputs(userLocation);
-                    },
-                    function(error) {
-                        console.log('Error getting location:', error);
-                    }
-                );
-            }
-        }
-
-        function setMarker(position) {
-            if (marker) {
-                marker.setMap(null);
-            }
-            marker = new google.maps.Marker({
+            marker = new AdvancedMarkerElement({
+                map: map,
                 position: position,
-                map: map
+                title: "Selected Location",
             });
+
+            map.addListener("click", (e) => {
+                const lat = e.latLng.lat();
+                const lng = e.latLng.lng();
+
+                marker.position = e.latLng;
+                document.getElementById("latitude").value = lat.toFixed(6);
+                document.getElementById("longitude").value = lng.toFixed(6);
+            });
+
+            document.getElementById("latitude").addEventListener("change", updateMarkerPosition);
+            document.getElementById("longitude").addEventListener("change", updateMarkerPosition);
         }
 
-        function updateCoordinateInputs(position) {
-            document.getElementById('latitude').value = position.lat;
-            document.getElementById('longitude').value = position.lng;
+        function updateMarkerPosition() {
+            const lat = parseFloat(document.getElementById("latitude").value);
+            const lng = parseFloat(document.getElementById("longitude").value);
+
+            if (!isNaN(lat) && !isNaN(lng)) {
+                const newPosition = { lat, lng };
+                marker.position = newPosition;
+                map.setCenter(newPosition);
+            }
         }
+
+        initMap();
 
         document.querySelector('form').addEventListener('submit', function(e) {
             const specialReqsInput = document.getElementById('special_requirements');
@@ -235,6 +215,7 @@
             }
         });
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&callback=initMap" async defer></script>
+    <script>(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
+    ({key: '{{ config("services.google.places_api_key") }}', v: "weekly"});</script>
     @endpush
 </x-app-layout>
