@@ -33,7 +33,7 @@ class BloodRequestController extends Controller
             return redirect()->route('donor.create');
         }
 
-        $bloodRequests = BloodRequest::where('status', 'pending')->get();
+        $bloodRequests = BloodRequest::where('status', 'pending')->orderBy('created_at', 'DESC')->get();
         $scoringService = app(DonorScoringService::class);
 
         // For each request, score the current donor
@@ -69,9 +69,9 @@ class BloodRequestController extends Controller
             'recipient_id' => 'required|exists:recipients,id',
             'blood_type_needed' => 'required|string|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
             'units_required' => 'required|integer|min:1',
-            'hospital_name' => 'required|string|max:255',
-            'hospital_address' => 'required|string|max:255',
-            'place_id' => 'required|string',
+            // 'hospital_name' => 'required|string|max:255',
+            // 'hospital_address' => 'required|string|max:255',
+            // 'place_id' => 'required|string',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'urgency_level' => 'required|string|in:normal,urgent,emergency',
@@ -82,15 +82,15 @@ class BloodRequestController extends Controller
         $recipient = Recipient::findOrFail($validated['recipient_id']);
 
         // Get place details from Google Places API
-        $placeDetails = $this->placesService->getPlaceDetails($validated['place_id']);
+        // $placeDetails = $this->placesService->getPlaceDetails($validated['place_id']);
         
-        if ($placeDetails) {
-            $validated['place_name'] = $placeDetails['place_name'];
-            $validated['city'] = $placeDetails['city'];
-            $validated['hospital_address'] = $placeDetails['formatted_address'];
-            $validated['latitude'] = $placeDetails['latitude'];
-            $validated['longitude'] = $placeDetails['longitude'];
-        }
+        // if ($placeDetails) {
+        //     $validated['place_name'] = $placeDetails['place_name'];
+        //     $validated['city'] = $placeDetails['city'];
+        //     $validated['hospital_address'] = $placeDetails['formatted_address'];
+        //     $validated['latitude'] = $placeDetails['latitude'];
+        //     $validated['longitude'] = $placeDetails['longitude'];
+        // }
 
         // Start a database transaction
         DB::beginTransaction();

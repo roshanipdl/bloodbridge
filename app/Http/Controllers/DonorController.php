@@ -30,7 +30,6 @@ class DonorController extends Controller
                 'name' => ['required', 'string', 'max:255'],
                 'blood_type' => ['required', 'string', Rule::in(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])],
                 'contact' => ['required', 'string', 'max:20', 'regex:/^[0-9+\-\s()]{10,20}$/'],
-                'address' => ['required', 'string', 'max:255'],
                 'place_id' => ['nullable', 'string'],
                 'latitude' => ['required', 'numeric', 'between:-90,90'],
                 'longitude' => ['required', 'numeric', 'between:-180,180'],

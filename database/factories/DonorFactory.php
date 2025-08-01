@@ -37,7 +37,6 @@ class DonorFactory extends Factory
             'name' => $this->faker->name,
             'blood_type' => $this->faker->randomElement($bloodTypes),
             'contact' => $this->faker->phoneNumber,
-            'address' => $this->faker->address,
             'place_name' => $this->faker->city,
             'city' => $this->faker->city,
             'latitude' => $latitude,

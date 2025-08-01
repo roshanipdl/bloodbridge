@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('name');
             $table->string('blood_type');
             $table->string('contact');
-            $table->string('address');
             $table->decimal('latitude', 10, 8);
             $table->decimal('longitude', 11, 8);
             $table->boolean('is_available')->default(true);

@@ -14,7 +14,7 @@ return new class extends Migration
         });
 
         Schema::table('donors', function (Blueprint $table) {
-            $table->string('place_name')->nullable()->after('address');
+            $table->string('place_name')->nullable()->after('longitude');
             $table->string('city')->nullable()->after('place_name');
         });
     }

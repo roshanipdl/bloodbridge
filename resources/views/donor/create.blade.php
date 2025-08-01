@@ -94,15 +94,6 @@
                                     <p class="mt-2 text-sm text-gray-600">Click on the map to set your location or use your current location</p>
                                 </div>
 
-                                <!-- Address -->
-                                <div>
-                                    <x-input-label for="address" :value="__('Address')" class="text-gray-700" />
-                                    <x-text-input id="address" class="block mt-1 w-full" type="text" name="address" 
-                                        :value="old('address')" required 
-                                        placeholder="Your address will be auto-filled when you select a location on the map" />
-                                    <x-input-error :messages="$errors->get('address')" class="mt-2" />
-                                </div>
-
                                 <!-- Coordinates -->
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
