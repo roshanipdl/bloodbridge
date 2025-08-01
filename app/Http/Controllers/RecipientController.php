@@ -21,16 +21,20 @@ class RecipientController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'contact' => 'required|string|max:20',
-            'address' => 'required|string|max:255',
-            'blood_type_needed' => 'required|string|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
-            'medical_notes' => 'nullable|string',
-            'special_requirements' => 'nullable|json'
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'contact' => 'required|string|max:20',
+                'address' => 'required|string|max:255',
+                'blood_type_needed' => 'required|string|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
+                'latitude' => 'required|numeric|between:-90,90',
+                'longitude' => 'required|numeric|between:-180,180',
+                'medical_notes' => 'nullable|string',
+                'special_requirements' => 'nullable|json'
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            dd($e->errors());
+        }
 
         $recipient = new Recipient($validated);
         $recipient->user_id = Auth::id();
@@ -63,8 +67,7 @@ class RecipientController extends Controller
             'blood_type_needed' => 'required|string|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
-            'medical_notes' => 'nullable|string',
-            'special_requirements' => 'nullable|json'
+            'medical_notes' => 'nullable|string'
         ]);
 
         $recipient->update($validated);

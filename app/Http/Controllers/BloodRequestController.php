@@ -8,17 +8,10 @@ use App\Models\Recipient;
 use App\Models\Donor;
 use Illuminate\Support\Facades\DB;
 use App\Services\DonorScoringService;
-use App\Services\GooglePlacesService;
 use Illuminate\Support\Facades\Auth;
 
 class BloodRequestController extends Controller
 {
-    protected $placesService;
-
-    public function __construct(GooglePlacesService $placesService)
-    {
-        $this->placesService = $placesService;
-    }
 
     /**
      * Display a listing of blood requests for potential donors.
@@ -67,11 +60,8 @@ class BloodRequestController extends Controller
     {
         $validated = $request->validate([
             'recipient_id' => 'required|exists:recipients,id',
-            'blood_type_needed' => 'required|string|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
+            'blood_group' => 'required|string|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
             'units_required' => 'required|integer|min:1',
-            // 'hospital_name' => 'required|string|max:255',
-            // 'hospital_address' => 'required|string|max:255',
-            // 'place_id' => 'required|string',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'urgency_level' => 'required|string|in:normal,urgent,emergency',
@@ -81,16 +71,7 @@ class BloodRequestController extends Controller
         // Get recipient details
         $recipient = Recipient::findOrFail($validated['recipient_id']);
 
-        // Get place details from Google Places API
-        // $placeDetails = $this->placesService->getPlaceDetails($validated['place_id']);
-        
-        // if ($placeDetails) {
-        //     $validated['place_name'] = $placeDetails['place_name'];
-        //     $validated['city'] = $placeDetails['city'];
-        //     $validated['hospital_address'] = $placeDetails['formatted_address'];
-        //     $validated['latitude'] = $placeDetails['latitude'];
-        //     $validated['longitude'] = $placeDetails['longitude'];
-        // }
+
 
         // Start a database transaction
         DB::beginTransaction();
@@ -99,12 +80,9 @@ class BloodRequestController extends Controller
             // Create the blood request
             $bloodRequest = new BloodRequest();
             $bloodRequest->recipient_id = $validated['recipient_id'];
-            $bloodRequest->blood_type_needed = $validated['blood_type_needed'];
+            $bloodRequest->recipient_name = $recipient->name;
+            $bloodRequest->blood_group = $validated['blood_group'];
             $bloodRequest->units_required = $validated['units_required'];
-            $bloodRequest->hospital_name = $validated['hospital_name'];
-            $bloodRequest->hospital_address = $validated['hospital_address'];
-            $bloodRequest->place_name = $validated['place_name'];
-            $bloodRequest->city = $validated['city'];
             $bloodRequest->latitude = $validated['latitude'];
             $bloodRequest->longitude = $validated['longitude'];
             $bloodRequest->urgency_level = $validated['urgency_level'];
@@ -113,15 +91,12 @@ class BloodRequestController extends Controller
             $bloodRequest->save();
 
             // Find matching donors using weighted scoring algorithm
-            $matchingDonors = $this->findMatchingDonors($recipient, $validated['blood_type_needed']);
+            $matchingDonors = $this->findMatchingDonors($recipient, $validated['blood_group']);
 
-            // Store donor matches with their scores
-            foreach ($matchingDonors as $match) {
-                $bloodRequest->potentialDonors()->attach($match['donor']->id, [
-                    'score' => $match['score'],
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ]);
+            // Store the highest scoring donor
+            if (!empty($matchingDonors)) {
+                $highestScoringDonor = $matchingDonors[0];
+                $bloodRequest->donor_id = $highestScoringDonor['donor']->id;
             }
 
             DB::commit();
@@ -129,8 +104,10 @@ class BloodRequestController extends Controller
             return redirect()->route('dashboard')
                 ->with('success', 'Blood request submitted successfully. Matching donors have been notified.');
         } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'An error occurred while processing your request. Please try again.');
+
+            dd($e->getMessage());
+            // DB::rollBack();
+            // return back()->with('error', 'An error occurred while processing your request. Please try again.');
         }
     }
 
@@ -169,9 +146,6 @@ class BloodRequestController extends Controller
         usort($matches, function($a, $b) {
             return $b['score'] <=> $a['score'];
         });
-
-        // Return top 5 matches
-        return array_slice($matches, 0, 5);
     }
 
     /**
@@ -270,8 +244,17 @@ class BloodRequestController extends Controller
                 ->with('error', 'This blood request has already been fulfilled or cancelled.');
         }
         
+        // Get donor record for current user
+        $donor = Donor::where('user_id', auth()->id())->first();
+        
+        // Check if donor exists
+        if (!$donor) {
+            return redirect()->route('donate')
+                ->with('error', 'Please create a donor profile first before responding to blood requests.');
+        }
+
         // Update the blood request
-        $bloodRequest->donor_id = auth()->id();
+        $bloodRequest->donor_id = $donor->id;
         $bloodRequest->status = 'fulfilled';
         $bloodRequest->fulfill_date = now();
         $bloodRequest->save();

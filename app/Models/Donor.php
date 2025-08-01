@@ -27,8 +27,6 @@ class Donor extends Model
         'blood_type',
         'contact',
         'address',
-        'place_name',
-        'city',
         'latitude',
         'longitude',
         'is_available',
@@ -76,21 +74,5 @@ class Donor extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function updateLocationFromPlaceId($placeId)
-    {
-        $placesService = app(GooglePlacesService::class);
-        $placeDetails = $placesService->getPlaceDetails($placeId);
 
-        if ($placeDetails) {
-            $this->update([
-                'place_name' => $placeDetails['place_name'],
-                'city' => $placeDetails['city'],
-                'latitude' => $placeDetails['latitude'],
-                'longitude' => $placeDetails['longitude'],
-                'address' => $placeDetails['formatted_address']
-            ]);
-        }
-
-        return $this;
-    }
 }

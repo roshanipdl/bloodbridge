@@ -120,15 +120,7 @@
                                     <x-input-error :messages="$errors->get('medical_notes')" class="mt-2" />
                                 </div>
 
-                                <!-- Special Requirements -->
-                                <div>
-                                    <x-input-label for="special_requirements" :value="__('Special Requirements')" class="text-gray-700" />
-                                    <textarea id="special_requirements" name="special_requirements" rows="3" 
-                                        class="block mt-1 w-full border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm"
-                                        placeholder="Enter special requirements (one per line)...">{{ old('special_requirements') }}</textarea>
-                                    <p class="mt-1 text-sm text-gray-500">Enter each requirement on a new line</p>
-                                    <x-input-error :messages="$errors->get('special_requirements')" class="mt-2" />
-                                </div>
+
                             </div>
                         </div>
 

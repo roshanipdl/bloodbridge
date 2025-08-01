@@ -48,8 +48,8 @@
 
                                 <!-- Blood Type -->
                                 <div>
-                                    <x-input-label for="blood_type_needed" :value="__('Required Blood Type')" class="text-gray-700" />
-                                    <select id="blood_type_needed" name="blood_type_needed"
+                                    <x-input-label for="blood_group" :value="__('Required Blood Type')" class="text-gray-700" />
+                                    <select id="blood_group" name="blood_group"
                                         class="block mt-1 w-full bg-white border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm">
                                         <option value="">Select a Blood Type</option>
                                         <option value="A+">A+</option>

@@ -2,21 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\Donor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Services\GooglePlacesService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class DonorController extends Controller
 {
-    protected $placesService;
 
-    public function __construct(GooglePlacesService $placesService)
-    {
-        $this->placesService = $placesService;
-    }
 
     public function create()
     {

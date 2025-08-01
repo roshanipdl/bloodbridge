@@ -31,14 +31,11 @@ class Recipient extends Model
         'user_id',
         'latitude',
         'longitude',
-        'medical_notes',
-        'special_requirements',
-        'urgency_level'
+        'medical_notes'
     ];
     protected $casts = [
         'latitude' => 'float',
-        'longitude' => 'float',
-        'special_requirements' => 'array'
+        'longitude' => 'float'
     ];
     // protected $hidden = [];
     // protected $dates = [];
