@@ -153,93 +153,48 @@
 
     @push('scripts')
     <script type="module">
-        // Initialize and add the map
         let map;
         let marker;
 
-        async function initMap() {
-            try {
-                const position = {
-                    lat: 27.7103,
-                    lng: 85.3222
-                };
+        async function initMap() {  
+            const position = {
+                lat: 27.7103,
+                lng: 85.3222
+            };
 
-                // Request needed libraries
-                const { Map } = await google.maps.importLibrary("maps");
-                const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+            const { Map } = await google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
-                // Create the map
-                map = new Map(document.getElementById("map"), {
-                    zoom: 15,
-                    center: position,
-                    mapId: "DEMO_MAP_ID",
-                    styles: [
-                        {
-                            featureType: "poi",
-                            elementType: "labels",
-                            stylers: [{ visibility: "off" }]
-                        }
-                    ]
-                });
+            map = new Map(document.getElementById("map"), {
+                zoom: 12,
+                center: position,
+                mapId: "DEMO_MAP_ID",
+                styles: [
+                    {
+                        featureType: "poi",
+                        elementType: "labels",
+                        stylers: [{ visibility: "off" }]
+                    }
+                ]
+            });
 
-                // Create the marker
-                marker = new AdvancedMarkerElement({
-                    map: map,
-                    position: position,
-                    title: "Selected Location",
-                });
+            marker = new AdvancedMarkerElement({
+                map: map,
+                position: position,
+                title: "Selected Location",
+            });
 
-                // Add click listener to map
-                map.addListener("click", (e) => {
-                    const lat = e.latLng.lat();
-                    const lng = e.latLng.lng();
+            map.addListener("click", (e) => {
+                const lat = e.latLng.lat();
+                const lng = e.latLng.lng();
 
-                    marker.position = e.latLng;
-                    document.getElementById("latitude").value = lat.toFixed(6);
-                    document.getElementById("longitude").value = lng.toFixed(6);
+                marker.position = e.latLng;
+                document.getElementById("latitude").value = lat.toFixed(6);
+                document.getElementById("longitude").value = lng.toFixed(6);
+            });
 
-                    // Update address using reverse geocoding
-                    const geocoder = new google.maps.Geocoder();
-                    const latlng = { lat: lat, lng: lng };
-                    
-                    geocoder.geocode({ 'location': latlng }, function(results, status) {
-                        if (status === 'OK') {
-                            if (results[0]) {
-                                document.getElementById('address').value = results[0].formatted_address;
-                            }
-                        } else {
-                            console.log('Geocoder failed due to: ' + status);
-                        }
-                    });
-                });
-
-                // Add input change listeners
-                document.getElementById("latitude").addEventListener("change", updateMarkerPosition);
-                document.getElementById("longitude").addEventListener("change", updateMarkerPosition);
-
-                // Try to get user's current location
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        function(position) {
-                            const userLocation = {
-                                lat: position.coords.latitude,
-                                lng: position.coords.longitude
-                            };
-                            map.setCenter(userLocation);
-                            map.setZoom(15);
-                            marker.position = userLocation;
-                            document.getElementById("latitude").value = userLocation.lat.toFixed(6);
-                            document.getElementById("longitude").value = userLocation.lng.toFixed(6);
-                        },
-                        function(error) {
-                            console.log('Error getting location:', error);
-                        }
-                    );
-                }
-
-            } catch (error) {
-                console.error('Error initializing map:', error);
-            }
+            document.getElementById("latitude").addEventListener("change", updateMarkerPosition);
+            document.getElementById("longitude").addEventListener("change", updateMarkerPosition);
         }
 
         function updateMarkerPosition() {
@@ -253,12 +208,22 @@
             }
         }
 
-        // Initialize the map
         initMap();
-    </script>
 
-    <!-- Load Google Maps API -->
-    <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&callback=initMap">
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const specialReqsInput = document.getElementById('special_requirements');
+            try {
+                const requirements = specialReqsInput.value.split('\n')
+                    .filter(line => line.trim())
+                    .map(line => line.trim());
+                specialReqsInput.value = JSON.stringify(requirements);
+            } catch (error) {
+                e.preventDefault();
+                alert('Please enter valid special requirements (one per line)');
+            }
+        });
     </script>
+    <script>(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
+    ({key: '{{ config("services.google.places_api_key") }}', v: "weekly"});</script>
+    @endpush
 </x-app-layout> 

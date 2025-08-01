@@ -49,10 +49,21 @@
                                 <!-- Blood Type -->
                                 <div>
                                     <x-input-label for="blood_type_needed" :value="__('Required Blood Type')" class="text-gray-700" />
-                                    <x-text-input id="blood_type_needed" class="block mt-1 w-full bg-gray-100" type="text"
-                                        name="blood_type_needed" readonly />
+                                    <select id="blood_type_needed" name="blood_type_needed"
+                                        class="block mt-1 w-full bg-white border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm">
+                                        <option value="">Select a Blood Type</option>
+                                        <option value="A+">A+</option>
+                                        <option value="A-">A−</option>
+                                        <option value="B+">B+</option>
+                                        <option value="B-">B−</option>
+                                        <option value="AB+">AB+</option>
+                                        <option value="AB-">AB−</option>
+                                        <option value="O+">O+</option>
+                                        <option value="O-">O−</option>
+                                    </select>
                                     <x-input-error :messages="$errors->get('blood_type_needed')" class="mt-2" />
                                 </div>
+                                
                             </div>
                         </div>
 
@@ -80,38 +91,13 @@
                                 <!-- Urgency Level -->
                                 <div class="md:col-span-2">
                                     <x-input-label for="urgency_level" :value="__('Urgency Level')" class="text-gray-700" />
-                                    <div class="mt-2 grid grid-cols-3 gap-4">
-                                        <label class="relative flex cursor-pointer rounded-lg border border-gray-300 bg-white p-4 shadow-sm focus:outline-none">
-                                            <input type="radio" name="urgency_level" value="normal" class="sr-only" checked>
-                                            <span class="flex flex-1">
-                                                <span class="flex flex-col">
-                                                    <span class="block text-sm font-medium text-gray-900">Normal</span>
-                                                    <span class="mt-1 flex items-center text-sm text-gray-500">Regular request</span>
-                                                </span>
-                                            </span>
-                                            <span class="pointer-events-none absolute -inset-px rounded-lg border-2" aria-hidden="true"></span>
-                                        </label>
-                                        <label class="relative flex cursor-pointer rounded-lg border border-gray-300 bg-white p-4 shadow-sm focus:outline-none">
-                                            <input type="radio" name="urgency_level" value="urgent" class="sr-only">
-                                            <span class="flex flex-1">
-                                                <span class="flex flex-col">
-                                                    <span class="block text-sm font-medium text-gray-900">Urgent</span>
-                                                    <span class="mt-1 flex items-center text-sm text-gray-500">Needed soon</span>
-                                                </span>
-                                            </span>
-                                            <span class="pointer-events-none absolute -inset-px rounded-lg border-2" aria-hidden="true"></span>
-                                        </label>
-                                        <label class="relative flex cursor-pointer rounded-lg border border-gray-300 bg-white p-4 shadow-sm focus:outline-none">
-                                            <input type="radio" name="urgency_level" value="emergency" class="sr-only">
-                                            <span class="flex flex-1">
-                                                <span class="flex flex-col">
-                                                    <span class="block text-sm font-medium text-gray-900">Emergency</span>
-                                                    <span class="mt-1 flex items-center text-sm text-gray-500">Immediate need</span>
-                                                </span>
-                                            </span>
-                                            <span class="pointer-events-none absolute -inset-px rounded-lg border-2" aria-hidden="true"></span>
-                                        </label>
-                                    </div>
+                                    <select id="urgency_level" name="urgency_level"
+                                        class="block w-full border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm">
+                                        <option value="normal" selected>Normal - Regular request</option>
+                                        <option value="urgent">Urgent - Needed soon</option>
+                                        <option value="emergency">Emergency - Immediate need</option>
+                                    </select>
+
                                     <x-input-error :messages="$errors->get('urgency_level')" class="mt-2" />
                                 </div>
                             </div>
