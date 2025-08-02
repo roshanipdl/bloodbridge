@@ -40,13 +40,23 @@ class DonorCrudController extends CrudController
     protected function setupListOperation()
     {
         CRUD::column('name');
-        CRUD::column('blood_group');
+        CRUD::column('blood_type');
+        CRUD::column('total_donations');
         CRUD::column('contact');
-        CRUD::column('address');
+        CRUD::column('latitude');
+        CRUD::column('longitude');
+        CRUD::column('is_available');
+        CRUD::column('health_status');
         CRUD::column('last_donation_date');
         CRUD::column('user_id');
         CRUD::column('created_at');
         CRUD::column('updated_at');
+        CRUD::column('donation_history');
+        CRUD::column('health_notes');
+        CRUD::column('next_eligible_donation_date');
+        CRUD::column('medical_conditions');
+        CRUD::column('last_health_check_date');
+        CRUD::column('donations_in_last_2_years');
 
         /**
          * Columns can be defined using the fluent syntax or array syntax:
@@ -66,11 +76,46 @@ class DonorCrudController extends CrudController
         CRUD::setValidation(DonorRequest::class);
 
         CRUD::field('name');
-        CRUD::field('blood_group');
+        CRUD::addField([
+            'name' => 'blood_type',
+            'label' => 'Blood Type',
+            'type' => 'select_from_array',
+            'options' => [
+                'A+' => 'A+',
+                'A-' => 'A-',
+                'B+' => 'B+',
+                'B-' => 'B-',
+                'AB+' => 'AB+',
+                'AB-' => 'AB-',
+                'O+' => 'O+',
+                'O-' => 'O-'
+            ]
+        ]);
+        CRUD::field('total_donations')->type('number');
         CRUD::field('contact');
-        CRUD::field('address');
+        CRUD::field('latitude')->type('number');
+        CRUD::field('longitude')->type('number');
+        CRUD::addField([
+            'name' => 'is_available',
+            'label' => 'Is Available',
+            'type' => 'boolean'
+        ]);
+        CRUD::addField([
+            'name' => 'health_status',
+            'label' => 'Health Status',
+            'type' => 'select_from_array',
+            'options' => [
+                'good' => 'Good',
+                'pending_review' => 'Pending Review',
+                'not_eligible' => 'Not Eligible'
+            ]
+        ]);
         CRUD::field('last_donation_date');
         CRUD::field('user_id');
+        CRUD::field('health_notes');
+        CRUD::field('next_eligible_donation_date');
+        CRUD::field('last_health_check_date');
+        CRUD::field('donations_in_last_2_years')->type('number');
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:

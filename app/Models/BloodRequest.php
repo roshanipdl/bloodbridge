@@ -15,21 +15,25 @@ class BloodRequest extends Model
         'blood_group',
         'units_required',
         'urgency_level',
+        'additional_info',
+        'notes',
         'status',
         'recipient_id',
         'latitude',
         'longitude',
-        'notes',
-        'created_by',
-        'required_by_date'
+        'required_by_date',
+        'donor_id',
+        'fulfill_date',
+        'created_by'
     ];
 
     protected $casts = [
-        'request_date' => 'date',
-        'fulfill_date' => 'date',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
         'required_by_date' => 'date',
-        'latitude' => 'decimal:8',
-        'longitude' => 'decimal:8'
+        'fulfill_date' => 'date',
+        'latitude' => 'decimal:7',
+        'longitude' => 'decimal:7'
     ];
 
     public function donor()
@@ -39,7 +43,7 @@ class BloodRequest extends Model
 
     public function recipient()
     {
-        return $this->belongsTo(Recipient::class, 'recipient_id');
+        return $this->belongsTo(User::class, 'recipient_id');
     }
 
     public function creator()

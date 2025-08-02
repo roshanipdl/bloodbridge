@@ -25,17 +25,13 @@ class Recipient extends Model
     protected $guarded = ['id'];
     protected $fillable = [
         'name',
-        'blood_type_needed',
         'contact',
-        'address',
         'user_id',
-        'latitude',
-        'longitude',
+        'address',
         'medical_notes'
     ];
     protected $casts = [
-        'latitude' => 'float',
-        'longitude' => 'float'
+        'request_timestamp' => 'datetime'
     ];
     // protected $hidden = [];
     // protected $dates = [];
@@ -54,12 +50,12 @@ class Recipient extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function bloodRequests()
     {
-        return $this->hasMany(BloodRequest::class);
+        return $this->hasMany(BloodRequest::class, 'recipient_id');
     }
 
     /*

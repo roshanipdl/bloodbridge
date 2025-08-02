@@ -42,17 +42,19 @@ class BloodRequestCrudController extends CrudController
         CRUD::column('recipient_name');
         CRUD::column('blood_group');
         CRUD::column('units_required');
-        CRUD::column('hospital_name');
-        CRUD::column('hospital_address');
-        CRUD::column('contact_number');
         CRUD::column('urgency_level');
         CRUD::column('additional_info');
+        CRUD::column('notes');
         CRUD::column('status');
-        CRUD::column('request_date');
-        CRUD::column('fulfill_date');
-        CRUD::column('donor_id');
         CRUD::column('recipient_id');
-
+        CRUD::column('created_at');
+        CRUD::column('updated_at');
+        CRUD::column('latitude');
+        CRUD::column('longitude');
+        CRUD::column('required_by_date');
+        CRUD::column('donor_id');
+        CRUD::column('fulfill_date');
+        CRUD::column('created_by');
         /**
          * Columns can be defined using the fluent syntax or array syntax:
          * - CRUD::column('price')->type('number');
@@ -71,18 +73,54 @@ class BloodRequestCrudController extends CrudController
         CRUD::setValidation(BloodRequestRequest::class);
 
         CRUD::field('recipient_name');
-        CRUD::field('blood_group');
+        CRUD::addField([
+            'name' => 'blood_group',
+            'label' => 'Blood Group',
+            'type' => 'select_from_array',
+            'options' => [
+                'A+' => 'A+',
+                'A-' => 'A-',
+                'B+' => 'B+',
+                'B-' => 'B-',
+                'AB+' => 'AB+',
+                'AB-' => 'AB-',
+                'O+' => 'O+',
+                'O-' => 'O-'
+            ]
+        ]);
+
+        CRUD::addField([
+            'name' => 'urgency_level',
+            'label' => 'Urgency Level',
+            'type' => 'select_from_array',
+            'options' => [
+                'normal' => 'Normal',
+                'urgent' => 'Urgent',
+                'critical' => 'Critical'
+            ]
+        ]);
+
+        CRUD::addField([
+            'name' => 'status',
+            'label' => 'Status',
+            'type' => 'select_from_array',
+            'options' => [
+                'pending' => 'Pending',
+                'fulfilled' => 'Fulfilled',
+                'cancelled' => 'Cancelled'
+            ]
+        ]);
+
         CRUD::field('units_required');
-        CRUD::field('hospital_name');
-        CRUD::field('hospital_address');
-        CRUD::field('contact_number');
-        CRUD::field('urgency_level');
         CRUD::field('additional_info');
-        CRUD::field('status');
-        CRUD::field('request_date');
-        CRUD::field('fulfill_date');
-        CRUD::field('donor_id');
+        CRUD::field('notes');
         CRUD::field('recipient_id');
+        CRUD::field('latitude')->type('number');
+        CRUD::field('longitude')->type('number');
+        CRUD::field('required_by_date');
+        CRUD::field('donor_id');
+        CRUD::field('fulfill_date');
+        CRUD::field('creator');
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:

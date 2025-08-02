@@ -40,10 +40,11 @@ class RecipientCrudController extends CrudController
     protected function setupListOperation()
     {
         CRUD::column('name');
-        CRUD::column('blood_group');
         CRUD::column('contact');
-        CRUD::column('address');
         CRUD::column('user_id');
+        CRUD::column('address');
+        CRUD::column('request_timestamp');
+        CRUD::column('medical_notes');
         CRUD::column('created_at');
         CRUD::column('updated_at');
 
@@ -65,10 +66,11 @@ class RecipientCrudController extends CrudController
         CRUD::setValidation(RecipientRequest::class);
 
         CRUD::field('name');
-        CRUD::field('blood_group');
         CRUD::field('contact');
-        CRUD::field('address');
         CRUD::field('user_id');
+        CRUD::field('address');
+        CRUD::field('request_timestamp');
+        CRUD::field('medical_notes');
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:
