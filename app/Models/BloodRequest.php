@@ -19,12 +19,15 @@ class BloodRequest extends Model
         'recipient_id',
         'latitude',
         'longitude',
-        'notes'
+        'notes',
+        'created_by',
+        'required_by_date'
     ];
 
     protected $casts = [
         'request_date' => 'date',
         'fulfill_date' => 'date',
+        'required_by_date' => 'date',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8'
     ];
@@ -39,5 +42,8 @@ class BloodRequest extends Model
         return $this->belongsTo(Recipient::class, 'recipient_id');
     }
 
-
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

@@ -56,4 +56,12 @@ class User extends Authenticatable
     {
         return 'email';
     }
+
+    public function donor() {
+        return $this->hasOne(Donor::class);
+    }
+
+    public function recipients() {
+        return $this->hasMany(Recipient::class);
+    }
 }

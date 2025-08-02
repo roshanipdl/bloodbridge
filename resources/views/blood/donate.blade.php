@@ -1,20 +1,17 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Donate Blood') }}
+            {{ __('Current Blood Requests') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
-                    {{ __('Current Blood Requests') }}
-                </h3>
 
                 @if ($bloodRequests->isEmpty())
                     <p class="text-gray-600 dark:text-gray-400">
-                        {{ __('There are no pending blood requests at the moment.') }}
+                        {{ __('There are no matching blood requests for you at the moment.') }}
                     </p>
                 @else
                     <div class="overflow-x-auto">

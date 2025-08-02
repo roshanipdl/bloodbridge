@@ -9,11 +9,22 @@ use Illuminate\Support\Facades\Auth;
 class RecipientController extends Controller
 {
     /**
+     * Display the authenticated user's recipients.
+     */
+    public function myRecipients()
+    {
+        $recipients = Recipient::where('user_id', Auth::id())->get();
+        return view('recipients.my-recipients', compact('recipients'));
+    }
+
+    /**
      * Show the form for creating a new recipient.
      */
     public function create()
     {
-        return view('recipients.create');
+        $recipient = null;
+
+        return view('recipients.create', compact('recipient'));
     }
 
     /**
@@ -26,17 +37,17 @@ class RecipientController extends Controller
                 'name' => 'required|string|max:255',
                 'contact' => 'required|string|max:20',
                 'address' => 'required|string|max:255',
-                'blood_type_needed' => 'required|string|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
-                'latitude' => 'required|numeric|between:-90,90',
-                'longitude' => 'required|numeric|between:-180,180',
                 'medical_notes' => 'nullable|string',
-                'special_requirements' => 'nullable|json'
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             dd($e->errors());
         }
 
-        $recipient = new Recipient($validated);
+        $recipient = new Recipient();
+        $recipient->name = $validated['name'];
+        $recipient->contact = $validated['contact'];
+        $recipient->address = $validated['address'];
+        $recipient->medical_notes = $validated['medical_notes'];
         $recipient->user_id = Auth::id();
         $recipient->save();
 
@@ -49,8 +60,12 @@ class RecipientController extends Controller
      */
     public function edit(Recipient $recipient)
     {
-        $this->authorize('update', $recipient);
-        return view('recipients.edit', compact('recipient'));
+        // Ensure the recipient belongs to the authenticated user
+        if ($recipient->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action');
+        }
+
+        return view('recipients.create', compact('recipient'));
     }
 
     /**
@@ -58,15 +73,15 @@ class RecipientController extends Controller
      */
     public function update(Request $request, Recipient $recipient)
     {
-        $this->authorize('update', $recipient);
+        // Ensure the recipient belongs to the authenticated user
+        if ($recipient->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action');
+        }
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'contact' => 'required|string|max:20',
             'address' => 'required|string|max:255',
-            'blood_type_needed' => 'required|string|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
             'medical_notes' => 'nullable|string'
         ]);
 

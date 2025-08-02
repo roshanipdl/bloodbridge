@@ -18,6 +18,36 @@ class DonorController extends Controller
         return view('donor.create');
     }
 
+    public function edit()
+    {
+        $donor = Auth::user()->donor;
+        if (!$donor) {
+            return redirect()->route('donor.create');
+        }
+        return view('donor.create', compact('donor'));
+    }
+
+    public function profileUpdate(Request $request, Donor $donor)
+    {
+        // Check if the logged-in user owns this donor profile
+        if ($donor->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'blood_type' => ['required', 'string', Rule::in(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])],
+            'contact' => ['required', 'string', 'max:20', 'regex:/^[0-9+\-\s()]{10,20}$/'],
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
+            'health_status' => ['required', 'string', Rule::in(['good', 'pending_review', 'not_eligible'])],
+        ]);
+
+        $donor->update($validated);
+
+        return redirect()->route('dashboard')->with('success', 'Donor profile updated successfully.');
+    }
+
     public function store(Request $request)
     {
         try {

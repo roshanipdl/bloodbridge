@@ -32,17 +32,32 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Blood request routes
     Route::get('/request', [BloodRequestController::class, 'create'])->name('request');
+    Route::get('/request/{bloodRequest}/edit', [BloodRequestController::class, 'edit'])->name('request.edit');
     Route::post('/request', [BloodRequestController::class, 'store'])->name('request.store');
+    Route::put('/request/{bloodRequest}', [BloodRequestController::class, 'update'])->name('request.update');
 
     // Add this inside the auth middleware group
     Route::post('/donate/{bloodRequest}', [BloodRequestController::class, 'respond'])->name('donate.respond');
+    Route::get('/requests/my', [BloodRequestController::class, 'myRequests'])->name('requests.my');
 
-    // Donor creation routes
+    // Donor routes
     Route::get('/donor/create', [DonorController::class, 'create'])->name('donor.create');
     Route::post('/donor', [DonorController::class, 'store'])->name('donor.store');
+    Route::get('/donor/edit', [DonorController::class, 'edit'])->name('donor.edit');
+    Route::put('/donor/{donor}', [DonorController::class, 'profileUpdate'])->name('donor.update');
+
+    // Recipient routes
+    Route::get('/recipients/my', [RecipientController::class, 'myRecipients'])->name('recipients.my');
+    Route::get('/recipient/{recipient}/edit', [RecipientController::class, 'edit'])->name('recipient.edit');
+    Route::put('/recipient/{recipient}', [RecipientController::class, 'update'])->name('recipient.update');
+    Route::delete('/recipient/{recipient}', [RecipientController::class, 'destroy'])->name('recipient.destroy');
 });
 
 Route::middleware('auth')->group(function () {
+    // Blood request routes
+    Route::delete('/blood-request/{bloodRequest}', [BloodRequestController::class, 'destroy'])->name('blood.request.destroy');
+    Route::get('/blood-request/{bloodRequest}/matching-donors', [BloodRequestController::class, 'viewMatchingDonors'])->name('blood.request.matching-donors');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/donor', [ProfileController::class, 'updateDonor'])->name('profile.update-donor');
@@ -53,6 +68,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/recipients', [RecipientController::class, 'store'])->name('recipients.store');
     Route::get('/recipients/{recipient}/edit', [RecipientController::class, 'edit'])->name('recipients.edit');
     Route::put('/recipients/{recipient}', [RecipientController::class, 'update'])->name('recipients.update');
+    Route::delete('/recipients/{recipient}', [RecipientController::class, 'destroy'])->name('recipient.destroy');
 });
 
 require __DIR__.'/auth.php';
