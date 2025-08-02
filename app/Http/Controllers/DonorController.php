@@ -15,7 +15,9 @@ class DonorController extends Controller
 
     public function create()
     {
-        return view('donor.create');
+        $donor = null;
+
+        return view('donor.create', compact('donor'));
     }
 
     public function edit()
