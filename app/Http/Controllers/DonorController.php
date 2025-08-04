@@ -47,7 +47,7 @@ class DonorController extends Controller
 
         $donor->update($validated);
 
-        return redirect()->route('dashboard')->with('success', 'Donor profile updated successfully.');
+        return redirect()->route('donor.update', ["donor" => $donor])->with('success', 'Donor profile updated successfully.');
     }
 
     public function show(Donor $donor)
@@ -102,7 +102,7 @@ class DonorController extends Controller
             $donor->user_id = Auth::id();
             $donor->save();
 
-            return redirect()->route('donate')
+            return redirect()->route('donor.edit')
                 ->with('success', 'Donor profile created successfully.');
 
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -159,7 +159,7 @@ class DonorController extends Controller
 
             $donor->update($validated);
 
-            return redirect()->route('dashboard')
+            return redirect()->route('donor.edit')
                 ->with('success', 'Donor profile updated successfully.');
         }
 
@@ -185,7 +185,7 @@ class DonorController extends Controller
         try {
             $donor->delete();
 
-            return redirect()->route('dashboard')
+            return redirect()->route('donor.create')
                 ->with('success', 'Donor profile deleted successfully.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()

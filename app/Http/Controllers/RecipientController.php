@@ -53,7 +53,7 @@ class RecipientController extends Controller
         $recipient->user_id = Auth::id();
         $recipient->save();
 
-        return redirect()->route('dashboard')
+        return redirect()->route('recipients.my')
             ->with('success', 'Recipient profile created successfully.');
     }
 
@@ -90,7 +90,7 @@ class RecipientController extends Controller
 
         $recipient->update($validated);
 
-        return redirect()->route('dashboard')
+        return redirect()->route('recipients.my')
             ->with('success', 'Recipient profile updated successfully.');
     }
 }

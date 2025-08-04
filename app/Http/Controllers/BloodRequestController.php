@@ -143,7 +143,7 @@ class BloodRequestController extends Controller
 
             DB::commit();
 
-            return redirect()->route('blood.requests.my')
+            return redirect()->route('requests.my')
                 ->with('success', 'Blood request updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -189,8 +189,8 @@ class BloodRequestController extends Controller
 
             DB::commit();
 
-            return redirect()->route('dashboard')
-                ->with('success', 'Blood request submitted successfully.');
+            return redirect()->route('requests.my')
+                ->with('success', 'Blood request created successfully.');
         } catch (\Exception $e) {
 
             dd($e->getMessage());
@@ -250,7 +250,7 @@ class BloodRequestController extends Controller
         ]);
 
         // Redirect with success message
-        return redirect()->route('requests.my')->with('success', 'Successfully responded to blood request.');
+        return redirect()->route('donor.history', ['donor' => $donor->id])->with('success', 'Successfully responded to blood request.');
     }
 
     /**
@@ -265,7 +265,7 @@ class BloodRequestController extends Controller
 
         // Only allow deletion of pending requests
         if ($bloodRequest->status !== 'pending') {
-            return redirect()->route('blood.requests.my')
+            return redirect()->route('requests.my')
                 ->with('error', 'Only pending requests can be deleted.');
         }
 

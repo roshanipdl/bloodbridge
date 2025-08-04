@@ -16,12 +16,6 @@
                     </h3>
                 </div>
 
-                @if(session('success'))
-                    <div class="mb-4 text-sm text-green-600 dark:text-green-400">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
                 @if($donationHistory->isEmpty())
                     <div class="text-center py-8">
                         <p class="text-gray-600 dark:text-gray-400">
@@ -71,8 +65,15 @@
                                             {{ $history->bloodRequest->recipient->name }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
-                                                {{ $history->donationRequest->status }}
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                                @if($history->donationRequest->status === 'pending') 
+                                                    bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100 
+                                                @elseif($history->donationRequest->status === 'approved') 
+                                                    bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 
+                                                @elseif($history->donationRequest->status === 'rejected') 
+                                                    bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100 
+                                                @endif">
+                                                {{ ucfirst($history->donationRequest->status) }}
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">

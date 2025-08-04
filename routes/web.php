@@ -5,6 +5,7 @@ use App\Http\Controllers\BloodDonationController;
 use App\Http\Controllers\BloodRequestController;
 use App\Http\Controllers\RecipientController;
 use App\Http\Controllers\DonorController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -72,5 +73,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/recipients/{recipient}', [RecipientController::class, 'update'])->name('recipients.update');
     Route::delete('/recipients/{recipient}', [RecipientController::class, 'destroy'])->name('recipient.destroy');
 });
+
+// Notification route
+Route::get('/send-notification/{id}', [NotificationController::class, 'sendNotification'])->name('send.notification');
 
 require __DIR__.'/auth.php';

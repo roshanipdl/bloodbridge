@@ -41,7 +41,7 @@ class DonationRequestCrudController extends CrudController
     {
         CRUD::addColumn([
             'name' => 'blood_request_id',
-            'label' => 'Recipient Name - Blood Group',
+            'label' => 'Blood request',
             'type' => 'select',
             'entity' => 'bloodRequest',
             'model' => \App\Models\BloodRequest::class,
@@ -51,6 +51,8 @@ class DonationRequestCrudController extends CrudController
         CRUD::column('donor_id');
         CRUD::column('status');
         CRUD::column('notes');
+
+        CRUD::addButtonFromView('line', 'send_notification', 'send_notification', 'beginning');
 
         /**
          * Columns can be defined using the fluent syntax or array syntax:
