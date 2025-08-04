@@ -5,7 +5,6 @@ namespace App\Models;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Services\GooglePlacesService;
 
 class Donor extends Model
 {
@@ -65,6 +64,10 @@ class Donor extends Model
     */
     public function user() {
         return $this->belongsTo(User::class);
+    }
+
+    public function donationHistory() {
+        return $this->hasMany(DonationHistory::class);
     }
 
     /*

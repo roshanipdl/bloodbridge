@@ -28,7 +28,7 @@
                                         {{ __('Units') }}
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        {{ __('Hospital') }}
+                                        {{ __('Distance') }}
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                         {{ __('Request Date') }}
@@ -39,7 +39,7 @@
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                         {{ __('Contact') }}
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                         {{ __('Actions') }}
                                     </th>
                                 </tr>
@@ -59,8 +59,7 @@
                                             {{ $request->units_required }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                            {{ $request->hospital_name }}<br>
-                                            <span class="text-xs text-gray-500 dark:text-gray-400">{{ $request->hospital_address }}</span>
+                                            {{ number_format($request->distance, 2) }} km 
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                             {{ \Carbon\Carbon::parse($request->request_date)->format('M d, Y') }}

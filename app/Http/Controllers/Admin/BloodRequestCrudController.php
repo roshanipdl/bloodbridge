@@ -40,21 +40,20 @@ class BloodRequestCrudController extends CrudController
     protected function setupListOperation()
     {
         CRUD::column('recipient_name');
-        CRUD::column('blood_group');
+        CRUD::column('hospital_name');
         CRUD::column('units_required');
         CRUD::column('urgency_level');
         CRUD::column('additional_info');
         CRUD::column('notes');
         CRUD::column('status');
         CRUD::column('recipient_id');
-        CRUD::column('created_at');
-        CRUD::column('updated_at');
         CRUD::column('latitude');
         CRUD::column('longitude');
         CRUD::column('required_by_date');
         CRUD::column('donor_id');
         CRUD::column('fulfill_date');
         CRUD::column('created_by');
+
         /**
          * Columns can be defined using the fluent syntax or array syntax:
          * - CRUD::column('price')->type('number');
@@ -73,22 +72,8 @@ class BloodRequestCrudController extends CrudController
         CRUD::setValidation(BloodRequestRequest::class);
 
         CRUD::field('recipient_name');
-        CRUD::addField([
-            'name' => 'blood_group',
-            'label' => 'Blood Group',
-            'type' => 'select_from_array',
-            'options' => [
-                'A+' => 'A+',
-                'A-' => 'A-',
-                'B+' => 'B+',
-                'B-' => 'B-',
-                'AB+' => 'AB+',
-                'AB-' => 'AB-',
-                'O+' => 'O+',
-                'O-' => 'O-'
-            ]
-        ]);
-
+        CRUD::field('hospital_name');
+        CRUD::field('units_required');
         CRUD::addField([
             'name' => 'urgency_level',
             'label' => 'Urgency Level',
@@ -99,7 +84,8 @@ class BloodRequestCrudController extends CrudController
                 'critical' => 'Critical'
             ]
         ]);
-
+        CRUD::field('additional_info');
+        CRUD::field('notes');
         CRUD::addField([
             'name' => 'status',
             'label' => 'Status',
@@ -107,20 +93,17 @@ class BloodRequestCrudController extends CrudController
             'options' => [
                 'pending' => 'Pending',
                 'fulfilled' => 'Fulfilled',
-                'cancelled' => 'Cancelled'
+                'cancelled' => 'Cancelled',
+                'processing' => 'Processing'
             ]
         ]);
-
-        CRUD::field('units_required');
-        CRUD::field('additional_info');
-        CRUD::field('notes');
         CRUD::field('recipient_id');
         CRUD::field('latitude')->type('number');
         CRUD::field('longitude')->type('number');
         CRUD::field('required_by_date');
         CRUD::field('donor_id');
         CRUD::field('fulfill_date');
-        CRUD::field('creator');
+        CRUD::field('created_by');
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:

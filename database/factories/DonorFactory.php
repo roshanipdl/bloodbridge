@@ -29,9 +29,9 @@ class DonorFactory extends Factory
         $bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
         $healthStatuses = ['good', 'pending_review', 'not_eligible'];
         
-        // Generate coordinates within a reasonable range (example: within a city)
-        $latitude = $this->faker->latitude(27.7, 27.8);  // Example: Kathmandu area
-        $longitude = $this->faker->longitude(85.3, 85.4);
+        // Generate coordinates within a 50km radius around Kathmandu
+        $latitude = $this->faker->latitude(27.5, 27.9);
+        $longitude = $this->faker->longitude(85.2, 85.6);
 
         return [
             'name' => $this->faker->name,

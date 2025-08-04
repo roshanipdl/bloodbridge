@@ -12,9 +12,9 @@ class BloodRequest extends Model
 
     protected $fillable = [
         'recipient_name',
-        'blood_group',
         'units_required',
         'urgency_level',
+        'hospital_name',
         'additional_info',
         'notes',
         'status',
@@ -43,11 +43,16 @@ class BloodRequest extends Model
 
     public function recipient()
     {
-        return $this->belongsTo(User::class, 'recipient_id');
+        return $this->belongsTo(Recipient::class, 'recipient_id');
     }
 
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function getCustomLabelAttribute()
+    {
+        return "{$this->id} - {$this->recipient_name} ( {$this->recipient->blood_group} )";
     }
 }

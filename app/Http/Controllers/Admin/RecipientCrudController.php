@@ -41,12 +41,11 @@ class RecipientCrudController extends CrudController
     {
         CRUD::column('name');
         CRUD::column('contact');
+        CRUD::column('blood_group');
         CRUD::column('user_id');
         CRUD::column('address');
         CRUD::column('request_timestamp');
         CRUD::column('medical_notes');
-        CRUD::column('created_at');
-        CRUD::column('updated_at');
 
         /**
          * Columns can be defined using the fluent syntax or array syntax:
@@ -66,7 +65,22 @@ class RecipientCrudController extends CrudController
         CRUD::setValidation(RecipientRequest::class);
 
         CRUD::field('name');
-        CRUD::field('contact');
+        CRUD::field('contact')->type('number');
+        CRUD::addField([
+            'name' => 'blood_group',
+            'label' => 'Blood Group',
+            'type' => 'select_from_array',
+            'options' => [
+                'A+' => 'A+',
+                'A-' => 'A-',
+                'B+' => 'B+',
+                'B-' => 'B-',
+                'AB+' => 'AB+',
+                'AB-' => 'AB-',
+                'O+' => 'O+',
+                'O-' => 'O-'
+            ]
+        ]);
         CRUD::field('user_id');
         CRUD::field('address');
         CRUD::field('request_timestamp');

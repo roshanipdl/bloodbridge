@@ -10,6 +10,15 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                        {{ __('Your requests') }}
+                    </h3>
+                    <a href="{{ route('request') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        {{ __('Create New Request') }}
+                    </a>
+                </div>
+
                     @if($bloodRequests->isEmpty())
                         <div class="text-center py-8">
                             <p class="text-gray-600 dark:text-gray-400">
@@ -25,10 +34,10 @@
                                             {{ __('Recipient') }}
                                         </th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            {{ __('Blood Group') }}
+                                            {{ __('Units Required') }}
                                         </th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            {{ __('Units Required') }}
+                                            {{ __('Hospital') }}
                                         </th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                             {{ __('Required By') }}
@@ -49,15 +58,16 @@
                                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                             {{ $request->recipient_name }}<br>
-                                            <span class="text-xs text-gray-500 dark:text-gray-400">{{ $request->recipient->contact }}</span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">{{ $request->recipient->contact }}</span><br>
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
-                                                {{ $request->blood_group }}
+                                                {{ $request->recipient->blood_group }}
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                             {{ $request->units_required }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                            {{ $request->hospital_name }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                             {{ $request->required_by_date ? $request->required_by_date->format('M d, Y') : '' }}
@@ -67,7 +77,7 @@
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">
                                                     {{ ucfirst($request->status) }}
                                                 </span>
-                                            @elseif($request->status == 'completed')
+                                            @elseif($request->status == 'fulfilled')
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
                                                     {{ ucfirst($request->status) }}
                                                 </span>

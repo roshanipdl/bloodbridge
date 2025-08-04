@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\DonorRequest;
+use App\Http\Requests\DonationRequestRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
 /**
- * Class DonorCrudController
+ * Class DonationRequestCrudController
  * @package App\Http\Controllers\Admin
  * @property-read \Backpack\CRUD\app\Library\CrudPanel\CrudPanel $crud
  */
-class DonorCrudController extends CrudController
+class DonationRequestCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
@@ -26,9 +26,9 @@ class DonorCrudController extends CrudController
      */
     public function setup()
     {
-        CRUD::setModel(\App\Models\Donor::class);
-        CRUD::setRoute(config('backpack.base.route_prefix') . '/donor');
-        CRUD::setEntityNameStrings('donor', 'donors');
+        CRUD::setModel(\App\Models\DonationRequest::class);
+        CRUD::setRoute(config('backpack.base.route_prefix') . '/donation-request');
+        CRUD::setEntityNameStrings('donation request', 'donation requests');
     }
 
     /**
@@ -39,16 +39,18 @@ class DonorCrudController extends CrudController
      */
     protected function setupListOperation()
     {
-        CRUD::column('name');
-        CRUD::column('blood_type');
-        CRUD::column('total_donations');
-        CRUD::column('contact');
-        CRUD::column('user_id');
-        CRUD::column('latitude');
-        CRUD::column('longitude');
-        CRUD::column('is_available');
-        CRUD::column('health_status');
-        CRUD::column('last_donation_date');
+        CRUD::addColumn([
+            'name' => 'blood_request_id',
+            'label' => 'Recipient Name - Blood Group',
+            'type' => 'select',
+            'entity' => 'bloodRequest',
+            'model' => \App\Models\BloodRequest::class,
+            'attribute' => 'custom_label',
+        ]);
+
+        CRUD::column('donor_id');
+        CRUD::column('status');
+        CRUD::column('notes');
 
         /**
          * Columns can be defined using the fluent syntax or array syntax:
@@ -65,45 +67,29 @@ class DonorCrudController extends CrudController
      */
     protected function setupCreateOperation()
     {
-        CRUD::setValidation(DonorRequest::class);
+        CRUD::setValidation(DonationRequestRequest::class);
 
-        CRUD::field('name');
         CRUD::addField([
-            'name' => 'blood_type',
-            'label' => 'Blood Type',
+            'name' => 'blood_request_id',
+            'type' => 'select',
+            'entity' => 'bloodRequest',
+            'model' => \App\Models\BloodRequest::class,
+            'attribute' => 'custom_label',
+            'label' => 'Blood Request'
+        ]);
+        CRUD::field('donor_id');
+        CRUD::addField([
+            'name' => 'status',
             'type' => 'select_from_array',
             'options' => [
-                'A+' => 'A+',
-                'A-' => 'A-',
-                'B+' => 'B+',
-                'B-' => 'B-',
-                'AB+' => 'AB+',
-                'AB-' => 'AB-',
-                'O+' => 'O+',
-                'O-' => 'O-'
-            ]
+            'pending' => 'Pending',
+            'approved' => 'Approved',
+            'rejected' => 'Rejected',
+            ],
+            'default' => 'pending',
+            'label' => 'Status'
         ]);
-        CRUD::field('total_donations')->type('number');
-        CRUD::field('contact');
-        CRUD::field('latitude')->type('number');
-        CRUD::field('longitude')->type('number');
-        CRUD::addField([
-            'name' => 'is_available',
-            'label' => 'Is Available',
-            'type' => 'boolean'
-        ]);
-        CRUD::addField([
-            'name' => 'health_status',
-            'label' => 'Health Status',
-            'type' => 'select_from_array',
-            'options' => [
-                'good' => 'Good',
-                'pending_review' => 'Pending Review',
-                'not_eligible' => 'Not Eligible'
-            ]
-        ]);
-        CRUD::field('last_donation_date');
-        CRUD::field('user_id');
+        CRUD::field('notes');
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:

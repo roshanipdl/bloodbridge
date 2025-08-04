@@ -16,9 +16,9 @@ class BloodRequestFactory extends Factory
         $bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
         $urgencyLevels = ['critical', 'urgent', 'normal'];
         
-        // Generate coordinates within a reasonable range (example: within a city)
-        $latitude = $this->faker->latitude(37.7, 37.8);  // Example: San Francisco area
-        $longitude = $this->faker->longitude(-122.5, -122.4);
+        // Generate coordinates within a 50km radius around Kathmandu
+        $latitude = $this->faker->latitude(27.5, 27.9);
+        $longitude = $this->faker->longitude(85.2, 85.6);
 
         return [
             'recipient_id' => User::factory(), // Create a new user for each request
@@ -73,4 +73,4 @@ class BloodRequestFactory extends Factory
             ];
         });
     }
-} 
+}

@@ -17,21 +17,18 @@
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                             {{ __('Dashboard') }}
                         </x-nav-link>
-                        
-                        <x-nav-link :href="route('request')" :active="request()->routeIs('request')">
-                            {{ __('Request Blood') }}
-                        </x-nav-link>
 
                         <x-nav-link :href="route('requests.my')" :active="request()->routeIs('requests.my')">
                             {{ __('My Requests') }}
                         </x-nav-link>
 
-                        <x-nav-link :href="route('donate')" :active="request()->routeIs('donate')">
-                            {{ __('Donate Blood') }}
-                        </x-nav-link>
 
                         <x-nav-link :href="route('recipients.my')" :active="request()->routeIs('recipients.my')">
                             {{ __('My Recipients') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('donate')" :active="request()->routeIs('donate')">
+                            {{ __('Donate Blood') }}
                         </x-nav-link>
 
                         @if(!Auth::user()->donor)

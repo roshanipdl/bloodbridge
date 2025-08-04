@@ -53,32 +53,33 @@
                                     <x-input-error :messages="$errors->get('address')" class="mt-2" />
                                 </div>  
 
-
-                                <!-- Medical Notes -->
+                                <!-- Blood Type -->
                                 <div>
-                                    <x-input-label for="medical_notes" :value="__('Medical Notes')" class="text-gray-700" />
-                                    <textarea id="medical_notes" name="medical_notes" 
-                                        class="block mt-1 w-full border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm min-h-[100px]"
-                                        placeholder="Enter any medical notes or special requirements">{{ old('medical_notes', $recipient ? $recipient->medical_notes : '') }}</textarea>
-                                    <x-input-error :messages="$errors->get('medical_notes')" class="mt-2" />
-                                </div>  
-                            </div>
-                        </div>
-
-                        <!-- Additional Information Section -->
-                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">Additional Information</h3>
-                            
-                            <div class="space-y-6">
-                                <!-- Medical Notes -->
-                                <div>
-                                    <x-input-label for="medical_notes" :value="__('Medical Notes')" class="text-gray-700" />
-                                    <textarea id="medical_notes" name="medical_notes" rows="3" 
-                                        class="block mt-1 w-full border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm"
-                                        placeholder="Enter any relevant medical information...">{{ old('medical_notes') }}</textarea>
-                                    <x-input-error :messages="$errors->get('medical_notes')" class="mt-2" />
+                                    <x-input-label for="blood_group" :value="__('Blood Group')" class="text-gray-700" />
+                                    <select id="blood_group" name="blood_group"
+                                        class="block w-full border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm">
+                                        <option value="">Select Blood Group</option>
+                                        <option value="A+" {{ $recipient && $recipient->blood_group == 'A+' ? 'selected' : '' }}>A+</option>
+                                        <option value="A-" {{ $recipient && $recipient->blood_group == 'A-' ? 'selected' : '' }}>A-</option>
+                                        <option value="B+" {{ $recipient && $recipient->blood_group == 'B+' ? 'selected' : '' }}>B+</option>
+                                        <option value="B-" {{ $recipient && $recipient->blood_group == 'B-' ? 'selected' : '' }}>B-</option>
+                                        <option value="AB+" {{ $recipient && $recipient->blood_group == 'AB+' ? 'selected' : '' }}>AB+</option>
+                                        <option value="AB-" {{ $recipient && $recipient->blood_group == 'AB-' ? 'selected' : '' }}>AB-</option>
+                                        <option value="O+" {{ $recipient && $recipient->blood_group == 'O+' ? 'selected' : '' }}>O+</option>
+                                        <option value="O-" {{ $recipient && $recipient->blood_group == 'O-' ? 'selected' : '' }}>O-</option>
+                                    </select>
+                                    <x-input-error :messages="$errors->get('blood_group')" class="mt-2" />
                                 </div>
                             </div>
+
+                            <!-- Medical Notes -->
+                            <div>
+                                <x-input-label for="medical_notes" :value="__('Medical Notes')" class="text-gray-700" />
+                                <textarea id="medical_notes" name="medical_notes" 
+                                    class="block mt-1 w-full border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm min-h-[100px]"
+                                    placeholder="Enter any medical notes or special requirements">{{ old('medical_notes', $recipient ? $recipient->medical_notes : '') }}</textarea>
+                                <x-input-error :messages="$errors->get('medical_notes')" class="mt-2" />
+                            </div>  
                         </div>
 
                         <div class="flex items-center justify-end gap-4">

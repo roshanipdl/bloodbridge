@@ -38,6 +38,7 @@ class RecipientController extends Controller
                 'contact' => 'required|string|max:20',
                 'address' => 'required|string|max:255',
                 'medical_notes' => 'nullable|string',
+                'blood_group' => 'required|string|max:20',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             dd($e->errors());
@@ -48,6 +49,7 @@ class RecipientController extends Controller
         $recipient->contact = $validated['contact'];
         $recipient->address = $validated['address'];
         $recipient->medical_notes = $validated['medical_notes'];
+        $recipient->blood_group = $validated['blood_group'];
         $recipient->user_id = Auth::id();
         $recipient->save();
 
@@ -82,7 +84,8 @@ class RecipientController extends Controller
             'name' => 'required|string|max:255',
             'contact' => 'required|string|max:20',
             'address' => 'required|string|max:255',
-            'medical_notes' => 'nullable|string'
+            'medical_notes' => 'nullable|string',
+            'blood_group' => 'required|string|max:20',
         ]);
 
         $recipient->update($validated);

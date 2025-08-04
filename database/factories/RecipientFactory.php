@@ -28,13 +28,13 @@ class RecipientFactory extends Factory
         $bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
         $urgencyLevels = ['normal', 'urgent', 'emergency'];
         
-        // Generate coordinates within a reasonable range (example: within a city)
-        $latitude = $this->faker->latitude(27.7, 27.8);  // Example: Kathmandu area
-        $longitude = $this->faker->longitude(85.3, 85.4);
+        // Generate coordinates within a 50km radius around Kathmandu
+        $latitude = $this->faker->latitude(27.5, 27.9);
+        $longitude = $this->faker->longitude(85.2, 85.6);
 
         return [
             'name' => $this->faker->name,
-            'blood_type_needed' => $this->faker->randomElement($bloodTypes),
+            'blood_group' => $this->faker->randomElement($bloodTypes),
             'contact' => $this->faker->phoneNumber,
             'address' => $this->faker->address,
             'user_id' => User::factory(),

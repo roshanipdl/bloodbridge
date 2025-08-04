@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RecipientRequest extends FormRequest
+class DonationRequestRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,12 +25,7 @@ class RecipientRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|min:2|max:255',
-            'contact' => 'required|numeric',
-            'blood_group' => 'required|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
-            'address' => 'required|min:5|max:255',
-            'medical_notes' => 'nullable|string|max:1000',
-            'request_timestamp' => 'nullable|date'
+            // 'name' => 'required|min:5|max:255'
         ];
     }
 

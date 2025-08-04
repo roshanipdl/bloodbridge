@@ -11,6 +11,16 @@
         </div>
     </x-slot>
 
+    @if ($errors->any())
+        <div class="mb-4">
+            <div class="font-medium text-red-600">{{ __('Whoops! Something went wrong.') }}</div>
+            <ul class="mt-3 list-disc list-inside text-sm text-red-600">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -39,32 +49,14 @@
                                         <option value="">Select a Recipient</option>
                                         @foreach ($recipients as $recipient)
                                             <option value="{{ $recipient->id }}"
-                                                data-blood-type="{{ $recipient->blood_type_needed }}"
+                                                data-blood-type="{{ $recipient->blood_group }}"
                                                 {{ $bloodRequest && $bloodRequest->recipient_id == $recipient->id ? 'selected' : '' }}>
-                                                {{ $recipient->name }} - {{ $recipient->blood_type_needed }} (Contact:
+                                                {{ $recipient->name }} - {{ $recipient->blood_group }} (Contact:
                                                 {{ $recipient->contact }})
                                             </option>
                                         @endforeach
                                     </select>
                                     <x-input-error :messages="$errors->get('recipient_id')" class="mt-2" />
-                                </div>
-
-                                <!-- Blood Type -->
-                                <div>
-                                    <x-input-label for="blood_group" :value="__('Blood Group')" class="text-gray-700" />
-                                    <select id="blood_group" name="blood_group"
-                                        class="block w-full border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm">
-                                        <option value="">Select Blood Group</option>
-                                        <option value="A+" {{ $bloodRequest && $bloodRequest->blood_group == 'A+' ? 'selected' : '' }}>A+</option>
-                                        <option value="A-" {{ $bloodRequest && $bloodRequest->blood_group == 'A-' ? 'selected' : '' }}>A-</option>
-                                        <option value="B+" {{ $bloodRequest && $bloodRequest->blood_group == 'B+' ? 'selected' : '' }}>B+</option>
-                                        <option value="B-" {{ $bloodRequest && $bloodRequest->blood_group == 'B-' ? 'selected' : '' }}>B-</option>
-                                        <option value="AB+" {{ $bloodRequest && $bloodRequest->blood_group == 'AB+' ? 'selected' : '' }}>AB+</option>
-                                        <option value="AB-" {{ $bloodRequest && $bloodRequest->blood_group == 'AB-' ? 'selected' : '' }}>AB-</option>
-                                        <option value="O+" {{ $bloodRequest && $bloodRequest->blood_group == 'O+' ? 'selected' : '' }}>O+</option>
-                                        <option value="O-" {{ $bloodRequest && $bloodRequest->blood_group == 'O-' ? 'selected' : '' }}>O-</option>
-                                    </select>
-                                    <x-input-error :messages="$errors->get('blood_group')" class="mt-2" />
                                 </div>
                                 
                             </div>
@@ -93,17 +85,26 @@
                                 </div>
 
                                 <!-- Urgency Level -->
-                                <div class="flex justify-between items-center mb-2">
+                                <div>
                                     <x-input-label for="urgency_level" :value="__('Urgency Level')" class="text-gray-700" />
-                                    <span class="text-sm text-gray-500">{{ __('Select how urgent this request is') }}</span>
+                                    <select id="urgency_level" name="urgency_level"
+                                        class="block w-full border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm">
+                                        <option value="normal" {{ $bloodRequest && $bloodRequest->urgency_level == 'normal' ? 'selected' : '' }}>{{ __('Normal') }}</option>
+                                        <option value="urgent" {{ $bloodRequest && $bloodRequest->urgency_level == 'urgent' ? 'selected' : '' }}>{{ __('Urgent') }}</option>
+                                        <option value="critical" {{ $bloodRequest && $bloodRequest->urgency_level == 'critical' ? 'selected' : '' }}>{{ __('Critical') }}</option>
+                                    </select>
+                                    <x-input-error :messages="$errors->get('urgency_level')" class="mt-2" />
                                 </div>
-                                <select id="urgency_level" name="urgency_level"
-                                    class="block w-full border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm">
-                                    <option value="normal" {{ $bloodRequest && $bloodRequest->urgency_level == 'normal' ? 'selected' : '' }}>{{ __('Normal') }}</option>
-                                    <option value="urgent" {{ $bloodRequest && $bloodRequest->urgency_level == 'urgent' ? 'selected' : '' }}>{{ __('Urgent') }}</option>
-                                    <option value="emergency" {{ $bloodRequest && $bloodRequest->urgency_level == 'emergency' ? 'selected' : '' }}>{{ __('Emergency') }}</option>
-                                </select>
-                                <x-input-error :messages="$errors->get('urgency_level')" class="mt-2" />
+
+                                <!-- Hospital name -->
+                                <div>
+                                    <x-input-label for="hospital_name" :value="__('Hospital Name')" class="text-gray-700" />
+                                    <input type="text" name="hospital_name" id="hospital_name"
+                                        class="block w-full border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm"
+                                        value="{{ $bloodRequest ? $bloodRequest->hospital_name : old('hospital_name') }}">
+                                    <x-input-error :messages="$errors->get('hospital_name')" class="mt-2" />
+                                </div>
+
                             </div>
                         </div>
 
@@ -152,7 +153,6 @@
                         <div class="flex items-center justify-end">
                             <x-primary-button class="bg-red-600 hover:bg-red-700 focus:bg-red-700 active:bg-red-900">
                                 {{ $bloodRequest ? __('Update Request') : __('Submit Request') }}
-                                {{ __('Submit Request') }}
                             </x-primary-button>
                         </div>
                     </form>

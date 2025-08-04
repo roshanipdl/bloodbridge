@@ -50,6 +50,20 @@ class DonorController extends Controller
         return redirect()->route('dashboard')->with('success', 'Donor profile updated successfully.');
     }
 
+    public function show(Donor $donor)
+    {
+        return view('donor.show', compact('donor'));
+    }
+
+    /**
+     * Show the donation history of a donor
+     */
+    public function history(Donor $donor)
+    {
+        $donationHistory = $donor->donationHistory()->latest('donation_date')->paginate(10);
+        return view('donor.history', compact('donor', 'donationHistory'));
+    }
+
     public function store(Request $request)
     {
         try {
@@ -83,19 +97,6 @@ class DonorController extends Controller
 
             // Convert checkbox value to boolean
             $validated['is_available'] = $request->has('is_available');
-
-            // Get place details from Google Places API if place_id is provided
-            if (!empty($validated['place_id'])) {
-                $placeDetails = $this->placesService->getPlaceDetails($validated['place_id']);
-                
-                if ($placeDetails) {
-                    $validated['place_name'] = $placeDetails['place_name'];
-                    $validated['city'] = $placeDetails['city'];
-                    $validated['address'] = $placeDetails['formatted_address'];
-                    $validated['latitude'] = $placeDetails['latitude'];
-                    $validated['longitude'] = $placeDetails['longitude'];
-                }
-            }
 
             $donor = new Donor($validated);
             $donor->user_id = Auth::id();
@@ -131,7 +132,6 @@ class DonorController extends Controller
                 'blood_type' => ['required', 'string', Rule::in(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])],
                 'contact' => ['required', 'string', 'max:20', 'regex:/^[0-9+\-\s()]{10,20}$/'],
                 'address' => ['required', 'string', 'max:255'],
-                'place_id' => ['nullable', 'string'],
                 'latitude' => ['required', 'numeric', 'between:-90,90'],
                 'longitude' => ['required', 'numeric', 'between:-180,180'],
                 'is_available' => ['boolean'],
@@ -146,7 +146,6 @@ class DonorController extends Controller
                 'contact.max' => 'Contact number cannot exceed 20 characters.',
                 'address.required' => 'Please enter your address.',
                 'address.max' => 'Address cannot exceed 255 characters.',
-                'place_id.string' => 'Invalid location data. Please try selecting the location again.',
                 'latitude.required' => 'Please select a location on the map.',
                 'latitude.between' => 'Invalid latitude value. Please select a location on the map.',
                 'longitude.required' => 'Please select a location on the map.',
@@ -158,39 +157,50 @@ class DonorController extends Controller
             // Convert checkbox value to boolean
             $validated['is_available'] = $request->has('is_available');
 
-            // Get place details from Google Places API if place_id is provided
-            if (!empty($validated['place_id'])) {
-                $placeDetails = $this->placesService->getPlaceDetails($validated['place_id']);
-                
-                if ($placeDetails) {
-                    $validated['place_name'] = $placeDetails['place_name'];
-                    $validated['city'] = $placeDetails['city'];
-                    $validated['address'] = $placeDetails['formatted_address'];
-                    $validated['latitude'] = $placeDetails['latitude'];
-                    $validated['longitude'] = $placeDetails['longitude'];
-                }
-            }
-
             $donor->update($validated);
 
             return redirect()->route('dashboard')
                 ->with('success', 'Donor profile updated successfully.');
+        }
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        catch (\Illuminate\Validation\ValidationException $e) {
             return back()
                 ->withInput()
                 ->withErrors($e->errors());
         } catch (\Exception $e) {
-            Log::error('Error updating donor profile: ' . $e->getMessage(), [
+            Log::error('Error deleting donor profile: ' . $e->getMessage(), [
                 'user_id' => Auth::id(),
                 'donor_id' => $donor->id,
-                'request_data' => $request->except(['password']),
                 'exception' => $e
             ]);
 
             return back()
                 ->withInput()
                 ->withErrors(['error' => 'An unexpected error occurred. Please try again later.']);
-        }
+        }   
+    }
+
+    public function destroy(Donor $donor)
+    {
+        try {
+            $donor->delete();
+
+            return redirect()->route('dashboard')
+                ->with('success', 'Donor profile deleted successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()
+                ->withInput()
+                ->withErrors($e->errors());
+        } catch (\Exception $e) {
+            Log::error('Error  deleting donor profile: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'donor_id' => $donor->id,
+                'exception' => $e
+            ]);
+
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'An unexpected error occurred. Please try again later.']);
+        }      
     }
 } 

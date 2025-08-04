@@ -10,13 +10,25 @@ class UserSeeder extends Seeder
 {
     public function run()
     {
-        $admin = User::create([
+        User::create([
             'name' => 'Normal User',
-            'email' => 'user@bloodbridge.com',
+            'email' => 'user1@bloodbridge.com',
             'password' => Hash::make('password'), // You should change this in production
             'email_verified_at' => now(),
         ]);
 
-        User::factory()->count(10)->create();
+        User::create([
+            'name' => 'Normal User',
+            'email' => 'user2@bloodbridge.com',
+            'password' => Hash::make('password'), // You should change this in production
+            'email_verified_at' => now(),
+        ]);
+
+        User::create([
+            'name' => 'Normal User',
+            'email' => 'user3@bloodbridge.com',
+            'password' => Hash::make('password'), // You should change this in production
+            'email_verified_at' => now(),
+        ]);
     }
 } 

@@ -43,7 +43,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Donor routes
     Route::get('/donor/create', [DonorController::class, 'create'])->name('donor.create');
     Route::post('/donor', [DonorController::class, 'store'])->name('donor.store');
-    Route::get('/donor/edit', [DonorController::class, 'edit'])->name('donor.edit');
+    Route::get('/donor/{donor}', [DonorController::class, 'show'])->name('donor.show');
+    Route::get('/donor/{donor}', [DonorController::class, 'edit'])->name('donor.edit');
+    Route::get('/donor/{donor}/history', [DonorController::class, 'history'])->name('donor.history');
     Route::put('/donor/{donor}', [DonorController::class, 'profileUpdate'])->name('donor.update');
 
     // Recipient routes

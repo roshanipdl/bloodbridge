@@ -66,12 +66,12 @@ class DonorScoringService
                 return null;
             }
         })
-        ->filter()
-        ->filter(function ($result) {
-            return $result['detailed_scores']['blood_compatibility'] > 0 
-                && $result['detailed_scores']['eligibility'] > 0;
-        })
-        ->sortByDesc('score')
+        // ->filter()
+        // ->filter(function ($result) {
+        //     return $result['detailed_scores']['blood_compatibility'] > 0 
+        //         && $result['detailed_scores']['eligibility'] > 0;
+        // })
+        // ->sortByDesc('score')
         ->values();
     }
 
@@ -80,9 +80,7 @@ class DonorScoringService
      */
     private function calculateLocationScore($donor, $request)
     {
-        $cacheKey = "distance_{$donor->id}_{$request->id}";
         
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($donor, $request) {
             $distance = $this->calculateDistance(
                 $donor->latitude,
                 $donor->longitude,
@@ -90,8 +88,7 @@ class DonorScoringService
                 $request->longitude
             );
 
-            return max(0, 1 - ($distance / self::MAX_DISTANCE));
-        });
+            return max(0, 1 - ((float) $distance / self::MAX_DISTANCE));
     }
 
     /**
@@ -112,6 +109,11 @@ class DonorScoringService
      */
     private function calculateBloodCompatibilityScore($donor, $request)
     {
+        $recipient = $request->recipient;
+        if (!$recipient) {
+            return 0;
+        }
+
         $compatibilityMatrix = [
             'A+' => ['A+', 'A-', 'O+', 'O-'],
             'A-' => ['A-', 'O-'],
@@ -123,7 +125,7 @@ class DonorScoringService
             'O-' => ['O-']
         ];
 
-        return in_array($donor->blood_type, $compatibilityMatrix[$request->blood_type]) ? 1 : 0;
+        return in_array($donor->blood_type, $compatibilityMatrix[$recipient->blood_group]) ? 1 : 0;
     }
 
     /**
@@ -135,7 +137,7 @@ class DonorScoringService
         
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($donor) {
             $maxDonations = 8; // Maximum expected donations in 2 years
-            $donationsIn2Years = $donor->donations()
+            $donationsIn2Years = $donor->donationHistory
                 ->where('created_at', '>=', now()->subYears(2))
                 ->count();
 
@@ -172,9 +174,86 @@ class DonorScoringService
     }
 
     /**
+     * Get compatible blood types for a given blood group
+     */
+    private function getCompatibleBloodTypes(string $bloodGroup): array
+    {
+        $compatibilityMatrix = [
+            'A+' => ['A+', 'A-', 'O+', 'O-'],
+            'A-' => ['A-', 'O-'],
+            'B+' => ['B+', 'B-', 'O+', 'O-'],
+            'B-' => ['B-', 'O-'],
+            'AB+' => ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+            'AB-' => ['A-', 'B-', 'AB-', 'O-'],
+            'O+' => ['O+', 'O-'],
+            'O-' => ['O-']
+        ];
+
+        return $compatibilityMatrix[$bloodGroup] ?? [];
+    }
+
+    /**
+     * Check if donor blood type is compatible with recipient blood type
+     */
+    private function isBloodTypeCompatible(string $donorType, string $recipientType): bool
+    {
+        return in_array($donorType, $this->getCompatibleBloodTypes($recipientType));
+    }
+
+
+
+    /**
+     * Find matching donors for a blood request
+     */
+    public function findMatchingDonors(BloodRequest $request): array
+    {
+        $donors = Donor::where('is_available', true)
+            ->where('health_status', true)
+            ->whereRaw('(last_donation_date IS NULL OR last_donation_date <= DATE_SUB(NOW(), INTERVAL 3 MONTH))')
+            ->get();
+
+        $matches = [];
+        $maxDistance = 50; // Maximum distance in kilometers
+
+        foreach ($donors as $donor) {
+            // Skip if blood type is not compatible
+            if (!$this->isBloodTypeCompatible($donor->blood_type, $request->recipient->blood_group)) {
+                continue;
+            }
+
+            // Calculate weighted score
+            $scores = [
+                'location' => $this->calculateLocationScore($donor, $request),
+                'eligibility' => $this->calculateEligibilityScore($donor),
+                'blood_compatibility' => $this->calculateBloodCompatibilityScore($donor, $request),
+                'donor_regularity' => $this->calculateDonorRegularityScore($donor),
+                'availability' => $this->calculateAvailabilityScore($donor),
+                'health_status' => $this->calculateHealthStatusScore($donor)
+            ];
+
+            $totalScore = $this->calculateTotalScore($scores);
+
+            if ($totalScore > 0) {
+                $matches[] = [
+                    'donor' => $donor,
+                    'score' => $totalScore,
+                    'detailed_scores' => $scores
+                ];
+            }
+        }
+
+        // Sort matches by score in descending order
+        usort($matches, function($a, $b) {
+            return $b['score'] <=> $a['score'];
+        });
+
+        return $matches;
+    }
+
+    /**
      * Calculate distance between two points using Haversine formula
      */
-    private function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    public function calculateDistance($lat1, $lon1, $lat2, $lon2)
     {
         $earthRadius = 6371; // Earth's radius in kilometers
 
